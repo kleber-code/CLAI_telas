@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title %}Calendário - CLAI{% endblock %}
+
+{% block page_heading %}Calendário{% endblock %}
+
+{% block content %}
+<div class="row my-4">
+    <div class="col-md-12">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3 class="fs-4"></h3>
+            <a href="{{ url_for('main.add_event') }}" class="btn btn-primary"><i class="bi bi-plus-circle me-1"></i> Adicionar Novo Evento</a>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="card shadow mb-4">
+            <div class="card-header bg-primary text-white py-3">
+                <h5 class="mb-0">Eventos no Calendário</h5>
+            </div>
+            <div class="card-body">
+                <div id='calendar'></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            locale: 'pt-br',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            },
+            buttonText: {
+                today: 'Hoje',
+                month: 'Mês',
+                week: 'Semana',
+                day: 'Dia'
+            },
+            events: {
+                url: '{{ url_for("main.calendar_api") }}', // API endpoint to fetch events
+                failure: function() {
+                    alert('Houve um erro ao carregar os eventos!');
+                }
+            },
+            eventClick: function(info) {
+                // Redirect to edit event page or show event details
+                window.location.href = '/calendar/' + info.event.id + '/edit';
+            },
+            dateClick: function(info) {
+                // Redirect to add event page with pre-selected date/time
+                var dateStr = info.dateStr; // e.g. "2023-01-01" or "2023-01-01T10:00:00"
+                window.location.href = '{{ url_for("main.add_event") }}?start_time=' + dateStr;
+            },
+            editable: true,
+            eventDrop: function(info) {
+                // Handle event drop (drag-and-drop) to update event start/end times
+                // Send an AJAX request to update the event in the database
+                fetch('/calendar/' + info.event.id + '/edit', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        start_time: info.event.start.toISOString(),
+                        end_time: info.event.end ? info.event.end.toISOString() : info.event.start.toISOString() // if no end time, use start
+                    })
+                }).then(response => {
+                    if (!response.ok) {
+                        alert('Erro ao atualizar evento!');
+                        info.revert(); // Revert event position if update fails
+                    }
+                });
+            },
+            eventResize: function(info) {
+                // Handle event resize to update event end time
+                // Send an AJAX request to update the event in the database
+                 fetch('/calendar/' + info.event.id + '/edit', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        start_time: info.event.start.toISOString(),
+                        end_time: info.event.end ? info.event.end.toISOString() : info.event.start.toISOString()
+                    })
+                }).then(response => {
+                    if (!response.ok) {
+                        alert('Erro ao atualizar evento!');
+                        info.revert(); // Revert event size if update fails
+                    }
+                });
+            }
+        });
+        calendar.render();
+    });
+</script>
+{% endblock %}

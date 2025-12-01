@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% from 'macros/form_macros.html' import render_field, render_submit_field %}
+{% block title %}Adicionar Observação - CLAI{% endblock %}
+
+{% block page_heading %}Adicionar Observação{% endblock %}
+
+{% block content %}
+<div class="row my-4">
+    <div class="col-md-8 mx-auto">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Adicionar Observação para {{ student.name }}</h5>
+            </div>
+            <div class="card-body">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}" role="alert">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+                    {{ render_field(form.observation_text) }}
+                    {{ render_field(form.justification) }}
+                    <div class="d-grid gap-2">
+                        {{ render_submit_field(form.submit, extra_classes="w-100 btn-success") }}
+                        <a href="{{ url_for('main.student_detail', student_id=student.id) }}" class="btn btn-secondary w-100">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

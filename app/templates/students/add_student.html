@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% from 'macros/form_macros.html' import render_field, render_submit_field %}
+{% block title %}Adicionar Aluno - CLAI{% endblock %}
+
+{% block page_heading %}Adicionar Aluno{% endblock %}
+
+{% block content %}
+<div class="row my-4">
+    <div class="col-md-8 mx-auto">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Formulário de Cadastro de Aluno</h5>
+            </div>
+            <div class="card-body">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}" role="alert">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <form method="POST" enctype="multipart/form-data">
+                    {{ form.hidden_tag() }}
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ render_field(form.name) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ render_field(form.matricula) }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ render_field(form.dob) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ render_field(form.cid) }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ render_field(form.email) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ render_field(form.phone) }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ render_field(form.grade) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ render_field(form.course) }}
+                        </div>
+                    </div>
+                    <hr class="my-4">
+                    <h5 class="mb-3 text-primary">Informações do Responsável</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ render_field(form.responsible_name) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ render_field(form.responsible_phone) }}
+                        </div>
+                    </div>
+                    {{ render_field(form.responsible_email) }}
+                    {{ render_field(form.picture) }}
+                    <div class="d-grid gap-2">
+                        {{ render_submit_field(form.submit, extra_classes="w-100 btn-success") }}
+                        <a href="{{ url_for('main.list_students') }}" class="btn btn-secondary w-100">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

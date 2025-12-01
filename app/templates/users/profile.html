@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% from 'macros/form_macros.html' import render_field, render_submit_field %}
+{% block title %}Meu Perfil - CLAI{% endblock %}
+
+{% block page_heading %}Meu Perfil{% endblock %}
+
+{% block content %}
+<div class="row my-4">
+    <div class="col-md-8 mx-auto">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Informações do Perfil</h5>
+            </div>
+            <div class="card-body text-center">
+                <img src="{{ image_file }}" alt="Foto de Perfil" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                <h3 class="mb-3">{{ current_user.name }}</h3>
+                <p class="text-muted">{{ current_user.email }}</p>
+                <hr>
+                <h5 class="mb-3 mt-4">Atualizar Perfil</h5>
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}" role="alert">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <form method="POST" enctype="multipart/form-data">
+                    {{ form.hidden_tag() }}
+                    {{ render_field(form.name) }}
+                    {{ render_field(form.email) }}
+                    {{ render_field(form.picture) }}
+                    <div class="d-grid gap-2 mt-4">
+                        {{ render_submit_field(form.submit, extra_classes="w-100") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

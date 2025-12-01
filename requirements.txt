@@ -1,0 +1,9 @@
+Flask
+peewee
+Flask-Login
+Flask-WTF
+python-dotenv
+Flask-Bcrypt
+pillow
+Faker
+email_validator

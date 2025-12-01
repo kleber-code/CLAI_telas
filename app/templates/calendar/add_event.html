@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% from 'macros/form_macros.html' import render_field, render_submit_field %}
+{% block title %}Adicionar Evento - CLAI{% endblock %}
+
+{% block page_heading %}Adicionar Evento{% endblock %}
+
+{% block content %}
+<div class="row my-4">
+    <div class="col-md-8 mx-auto">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Adicionar Novo Evento</h5>
+            </div>
+            <div class="card-body">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}" role="alert">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+                    {{ render_field(form.title) }}
+                    {{ render_field(form.description) }}
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ render_field(form.start_time) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ render_field(form.end_time) }}
+                        </div>
+                    </div>
+                    {{ render_field(form.student_id) }}
+                    <div class="d-grid gap-2">
+                        {{ render_submit_field(form.submit, extra_classes="w-100") }}
+                        <a href="{{ url_for('main.calendar') }}" class="btn btn-secondary w-100">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

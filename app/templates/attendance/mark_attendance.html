@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% from 'macros/form_macros.html' import render_field, render_submit_field %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block page_heading %}Marcar Frequência{% endblock %}
+
+{% block head_extra %}
+<style>
+    .form-select.status-present {
+        background-color: #d4edda; /* Light green */
+        border-color: #c3e6cb;
+    }
+    .form-select.status-absent {
+        background-color: #f8d7da; /* Light red */
+        border-color: #f5c6cb;
+    }
+    .form-select.status-justified_absent {
+        background-color: #fff3cd; /* Light yellow */
+        border-color: #ffeeba;
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+<div class="row my-4">
+    <div class="col-md-10 mx-auto">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white py-3">
+                <h5 class="mb-0">Marcar Frequência para {{ selected_date.strftime("%d/%m/%Y") }}</h5>
+            </div>
+            <div class="card-body">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}" role="alert">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <form action="{{ url_for('main.mark_attendance') }}" method="GET" class="mb-4">
+                    <div class="row align-items-end">
+                        <div class="col-md-4">
+                            <label for="attendanceDate" class="form-label">Selecionar Data:</label>
+                            <input type="date" class="form-control" id="attendanceDate" name="date" value="{{ selected_date_str }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="gradeFilter" class="form-label">Filtrar por Turma:</label>
+                            <select class="form-select" id="gradeFilter" name="grade" onchange="this.form.submit()">
+                                <option value="">Todas as Turmas</option>
+                                {% for grade in all_grades %}
+                                    <option value="{{ grade }}" {% if grade == selected_grade %}selected{% endif %}>{{ grade }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">Carregar</button>
+                        </div>
+                    </div>
+                </form>
+
+                <form method="POST" action="{{ url_for('main.mark_attendance', date=selected_date_str, grade=selected_grade) }}">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Aluno</th>
+                                    <th>Status da Frequência</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for student in students %}
+                                <tr>
+                                    <td>{{ student.name }}</td>
+                                    <td>
+                                        <select class="form-select attendance-status" name="status_{{ student.id }}" id="status_{{ student.id }}">
+                                            <option value="present" {% if existing_attendance.get(student.id) == 'present' %}selected{% endif %}>Presente</option>
+                                            <option value="absent" {% if existing_attendance.get(student.id) == 'absent' %}selected{% endif %}>Ausente</option>
+                                            <option value="justified_absent" {% if existing_attendance.get(student.id) == 'justified_absent' %}selected{% endif %}>Ausência Justificada</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-success w-100">Salvar Frequências</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const statusSelects = document.querySelectorAll('.attendance-status');
+
+        function updateColor(selectElement) {
+            selectElement.classList.remove('status-present', 'status-absent', 'status-justified_absent');
+            const selectedValue = selectElement.value;
+            if (selectedValue) {
+                selectElement.classList.add('status-' + selectedValue);
+            }
+        }
+
+        statusSelects.forEach(function(select) {
+            // Set initial color
+            updateColor(select);
+
+            // Add change event listener
+            select.addEventListener('change', function() {
+                updateColor(this);
+            });
+        });
+        
+        // Also add an onchange submit to the date picker
+        const datePicker = document.getElementById('attendanceDate');
+        datePicker.addEventListener('change', function() {
+            this.form.submit();
+        });
+    });
+</script>
+{% endblock %}

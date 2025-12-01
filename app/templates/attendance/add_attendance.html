@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% from 'macros/form_macros.html' import render_field, render_submit_field %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block page_heading %}
+<h1 class="h5 m-0 fw-semibold text-body">{{ title }}</h1>
+{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white py-3">
+        <h6 class="mb-0 fw-bold">Preencher Frequência</h6>
+    </div>
+    <div class="card-body">
+        <form method="POST" action="" novalidate>
+            {{ form.hidden_tag() }}
+            {{ render_field(form.student_id) }}
+            {{ render_field(form.date) }}
+            {{ render_field(form.status) }}
+            <div class="d-grid gap-2">
+                {{ render_submit_field(form.submit, extra_classes="w-100") }}
+                <a href="{{ url_for('main.list_attendance') }}" class="btn btn-secondary w-100">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

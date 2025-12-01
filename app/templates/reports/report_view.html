@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block title %}Relatório de {{ student.name }} - CLAI{% endblock %}
+
+{% block content %}
+<style>
+    /* Print-specific styles */
+    @media print {
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #fff !important; /* Ensure white background for printing */
+            color: #000 !important;
+        }
+        #sidebar-wrapper, .main-navbar { /* Hide sidebar and main navbar */
+            display: none !important;
+        }
+        #page-content-wrapper { /* Ensure content takes full width */
+            width: 100% !important;
+            padding: 0 !important;
+            margin-left: 0 !important;
+        }
+        .report-container {
+            box-shadow: none !important;
+            border: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            max-width: none !important;
+            width: 100% !important;
+        }
+        .no-print {
+            display: none !important;
+        }
+        .card, .table {
+            border: 1px solid #dee2e6 !important; /* Ensure borders are visible in print */
+            box-shadow: none !important;
+        }
+        .card-header, .table th, .table td {
+            background-color: #f8f9fa !important; /* Light background for headers in print */
+            color: #000 !important;
+        }
+    }
+</style>
+
+<div class="row my-4 no-print">
+    <div class="col-12 text-end">
+        <button class="btn btn-primary me-2" onclick="window.print()"><i class="bi bi-printer me-2"></i>Imprimir Layout Visual</button>
+        <a href="{{ url_for('main.view_report_printable', student_id=student.id, start_date=start_date.strftime('%Y-%m-%d'), end_date=end_date.strftime('%Y-%m-%d')) }}" class="btn btn-success me-2" target="_blank">
+            <i class="bi bi-printer me-2"></i>Imprimir Layout Simples (Recomendado)
+        </a>
+        <button class="btn btn-secondary" onclick="window.history.back()"><i class="bi bi-arrow-left me-2"></i>Voltar</button>
+    </div>
+</div>
+
+<div class="row my-4">
+    <div class="col-md-10 mx-auto">
+        <div class="card shadow report-container">
+            <div class="card-header bg-light text-center py-3 border-bottom">
+                <img src="{{ url_for('static', filename='img/logo-clai.jpeg') }}" alt="Logo CLAI" class="img-fluid mb-2" style="max-width: 100px;">
+                <h2 class="h4 mb-0 text-primary">Relatório de Acompanhamento do Aluno</h2>
+                <h3 class="h5 mb-0 text-dark">{{ student.name }}</h3>
+                <p class="mb-0 text-muted">Período: {{ start_date.strftime('%d/%m/%Y') }} a {{ end_date.strftime('%d/%m/%Y') }}</p>
+            </div>
+
+            <div class="card-body">
+                <h5 class="mb-3 text-primary">Informações do Aluno</h5>
+                <p class="mb-1"><strong>Matrícula:</strong> {{ student.matricula }}</p>
+                <p class="mb-1"><strong>Data de Nascimento:</strong> {{ student.dob.strftime('%d/%m/%Y') }}</p>
+                <p class="mb-1"><strong>CID:</strong> {{ student.cid if student.cid else 'N/A' }}</p>
+                <p class="mb-3"><strong>Pedagoga Responsável:</strong> {{ student.pedagogue.name }}</p>
+
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-0 text-primary"><i class="bi bi-bar-chart-fill me-2"></i>Resumo do Período</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-md-4">
+                                <h4 class="display-6 text-primary">{{ total_observations }}</h4>
+                                <p class="text-muted">Observações Registradas</p>
+                            </div>
+                            <div class="col-md-4">
+                                <h4 class="display-6 text-primary">{{ report_duration_days }}</h4>
+                                <p class="text-muted">Dias no Período</p>
+                            </div>
+                            <div class="col-md-4">
+                                <h4 class="display-6 text-primary">{{ avg_obs_per_day }}</h4>
+                                <p class="text-muted">Média de Obs. por Dia</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h5 class="mb-3 mt-4 text-primary">Histórico de Observações</h5>
+                {% if observations %}
+                    <div class="list-group">
+                        {% for obs in observations %}
+                            <a href="#" class="list-group-item list-group-item-action flex-column align-items-start mb-2">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1 text-dark">Data: {{ obs.date.strftime('%d/%m/%Y') }}</h6>
+                                    <small class="text-muted">Pedagoga: {{ obs.pedagogue.name }}</small>
+                                </div>
+                                <p class="mb-1">{{ obs.observation_text }}</p>
+                                {% if obs.justification %}
+                                    <small class="text-muted">Justificativa (Edição): {{ obs.justification }}</small>
+                                {% endif %}
+                                <small class="text-muted d-block mt-2 text-end">ID da Observação: {{ obs.id }}</small>
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="alert alert-info text-center" role="alert">
+                        <h4 class="alert-heading"><i class="bi bi-info-circle me-2"></i>Sem Observações</h4>
+                        <p class="mb-0">Nenhuma observação encontrada para o período selecionado.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

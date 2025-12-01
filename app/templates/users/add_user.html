@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% from 'macros/form_macros.html' import render_field, render_submit_field %}
+{% block title %}Adicionar Usuário - CLAI{% endblock %}
+
+{% block page_heading %}Adicionar Usuário{% endblock %}
+
+{% block content %}
+<div class="row my-4">
+    <div class="col-md-8 mx-auto">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Formulário de Cadastro de Usuário</h5>
+            </div>
+            <div class="card-body">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}" role="alert">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ render_field(form.name) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ render_field(form.username) }}
+                        </div>
+                    </div>
+                    {{ render_field(form.email) }}
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ render_field(form.password) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ render_field(form.confirm_password) }}
+                        </div>
+                    </div>
+                    {{ render_field(form.role) }}
+                    <div class="d-grid gap-2">
+                        {{ render_submit_field(form.submit, extra_classes="w-100") }}
+                        <a href="{{ url_for('main.list_users') }}" class="btn btn-secondary w-100">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
