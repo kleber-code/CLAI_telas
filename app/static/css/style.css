@@ -401,27 +401,27 @@ body {
 
 /* High-Contrast Theme */
 html[data-bs-theme="high-contrast"] {
-    --bs-primary: #00ffff; /* Cyan for primary accents */
+    --bs-primary: #ffff00; /* Bright Yellow for primary accents */
     --bs-secondary: #ffffff; /* Pure white for secondary elements */
 
     --bs-success: #00ff00; /* Bright green */
-    --bs-info: #ffff00;    /* Bright yellow */
+    --bs-info: #00ffff;    /* Bright cyan */
     --bs-warning: #ff00ff; /* Magenta */
     --bs-danger: #ff0000;  /* Pure red */
 
     --bs-light: #333333;   /* Dark grey for elements often light */
     --bs-body-bg: #000000;      /* Pure black background */
     --bs-body-color: #ffffff;   /* Pure white text */
-    --bs-secondary-color: #e0e0e0; /* Light grey for secondary text */
-    --bs-tertiary-bg: #222222;  /* Very dark grey for cards, subtle backgrounds */
-    --bs-border-color: #00ffff; /* Cyan border */
+    --bs-secondary-color: #eeeeee; /* Slightly off-white secondary text */
+    --bs-tertiary-bg: #111111;  /* Very dark grey for cards, subtle backgrounds */
+    --bs-border-color: #ffffff; /* White border */
     
     --bs-dark: #cccccc;    /* Light grey for elements often dark */
 
-    --bs-primary-rgb: 0, 255, 255;
+    --bs-primary-rgb: 255, 255, 0;
     --bs-secondary-rgb: 255, 255, 255;
     --bs-success-rgb: 0, 255, 0;
-    --bs-info-rgb: 255, 255, 0;
+    --bs-info-rgb: 0, 255, 255;
     --bs-warning-rgb: 255, 0, 255;
     --bs-danger-rgb: 255, 0, 0;
 
@@ -453,7 +453,7 @@ html[data-bs-theme="high-contrast"] {
     }
     .list-group-item:hover {
         background-color: var(--bs-primary) !important;
-        color: var(--bs-body-bg) !important; /* Inverte cor para hover */
+        color: var(--bs-body-bg) !important; /* Inverte color for hover */
     }
     .list-group-item.active {
         background-color: var(--bs-primary) !important;
