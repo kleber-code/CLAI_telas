@@ -1,14 +1,14 @@
 from flask import Flask
 from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
-import os # Added for FLASK_DEBUG check
+import os
 
 from .models import db, User, create_tables
 from config import Config
 
 
 login_manager = LoginManager()
-login_manager.login_view = 'main.login'  # The name of the login view function
+login_manager.login_view = 'main.login'
 bcrypt = Bcrypt()
 
 def create_app(config_class=Config):
@@ -30,11 +30,10 @@ def create_app(config_class=Config):
 
     @app.cli.command('init_db')
     def init_db_command():
-        """Initializes the database tables and optionally creates a default admin user."""
         create_tables()
         print("Database tables created.")
 
-        if os.environ.get('FLASK_DEBUG') == '1': # Only create in debug/development mode
+        if os.environ.get('FLASK_DEBUG') == '1':
             with app.app_context():
                 if not User.select().where(User.email == 'admin@clai.com').exists():
                     hashed_password = bcrypt.generate_password_hash('admin').decode('utf-8')
@@ -61,6 +60,6 @@ def create_app(config_class=Config):
     def inject_config():
         return dict(config=app.config)
 
-    app.register_blueprint(routes.bp)  # Assuming routes are in a blueprint named 'bp' in routes.py
+    app.register_blueprint(routes.bp)
 
     return app

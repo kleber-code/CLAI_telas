@@ -112,34 +112,39 @@
             labels: {{ chart_labels | tojson }},
             datasets: [{
                 data: {{ chart_data | tojson }},
+                // Usando cores HEX básicas e diretas.
+                // Sem dependência de CSS externo.
                 backgroundColor: [
-                    'rgba(52, 98, 148, 0.8)',   // Primary blue
-                    'rgba(59, 74, 89, 0.8)',    // Secondary blue-gray
-                    'rgba(120, 152, 182, 0.8)', // Lighter blue
-                    'rgba(102, 136, 136, 0.8)', // Desaturated teal
-                    'rgba(136, 119, 153, 0.8)', // Desaturated purple
-                    'rgba(170, 136, 102, 0.8)'  // Desaturated orange
+                    '#0d6efd', // Azul (Primary)
+                    '#198754', // Verde (Success)
+                    '#ffc107', // Amarelo/Laranja (Warning)
+                    '#dc3545', // Vermelho (Danger)
+                    '#0dcaf0', // Ciano (Info)
+                    '#6c757d'  // Cinza (Secondary)
                 ],
                 borderColor: [
-                    'rgba(52, 98, 148, 1)',
-                    'rgba(59, 74, 89, 1)',
-                    'rgba(120, 152, 182, 1)',
-                    'rgba(102, 136, 136, 1)',
-                    'rgba(136, 119, 153, 1)',
-                    'rgba(170, 136, 102, 1)'
+                    '#ffffff', // Borda branca para separar as fatias
+                    '#ffffff',
+                    '#ffffff',
+                    '#ffffff',
+                    '#ffffff',
+                    '#ffffff'
                 ],
-                borderWidth: 1
+                borderWidth: 2
             }]
         },
         options: {
             responsive: true,
             plugins: {
                 legend: {
-                    position: 'top',
+                    position: 'bottom'
                 },
                 title: {
                     display: true,
-                    text: 'Distribuição de Alunos por Curso'
+                    text: 'Distribuição de Alunos por Curso',
+                    font: {
+                        size: 16
+                    }
                 }
             }
         }

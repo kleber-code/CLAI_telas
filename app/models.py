@@ -15,7 +15,7 @@ class User(UserMixin, BaseModel):
     password = CharField()
     name = CharField()
     profile_picture = CharField(default='default_profile.png')
-    role = CharField(default='pedagogue')  # 'admin', 'pedagogue'
+    role = CharField(default='pedagogue')
 
     def get_id(self):
         return str(self.id)
@@ -26,19 +26,19 @@ class User(UserMixin, BaseModel):
 class Student(BaseModel):
     name = CharField()
     matricula = CharField(unique=True)
-    dob = DateField()  # Date of Birth
-    cid = CharField(null=True)  # International Classification of Diseases
+    dob = DateField()
+    cid = CharField(null=True)
     email = CharField(null=True)
     phone = CharField(null=True)
-    grade = CharField(null=True)  # Turma
+    grade = CharField(null=True)
     course = CharField(null=True)
     responsible_name = CharField(null=True)
     responsible_phone = CharField(null=True)
     responsible_email = CharField(null=True)
-    responsible_cpf = CharField(null=True) # Responsible CPF field added
-    pedagogue = ForeignKeyField(User, backref='students', null=True)  # Assign a primary pedagogue
+    responsible_cpf = CharField(null=True)
+    pedagogue = ForeignKeyField(User, backref='students', null=True)
     student_picture = CharField(default='default_student.png')
-    specific_needs_description = TextField(null=True)  # New field for RF05
+    specific_needs_description = TextField(null=True)
 
     class Meta:
         table_name = 'students'
@@ -48,7 +48,7 @@ class Observation(BaseModel):
     pedagogue = ForeignKeyField(User, backref='made_observations')
     date = DateField(default=datetime.date.today)
     observation_text = TextField()
-    justification = TextField(null=True)  # For updates, not for initial creation
+    justification = TextField(null=True)
 
     class Meta:
         table_name = 'observations'
@@ -56,7 +56,7 @@ class Observation(BaseModel):
 class Attendance(BaseModel):
     student = ForeignKeyField(Student, backref='attendance_records')
     date = DateField(default=datetime.date.today)
-    status = CharField(default='present')  # 'present', 'absent', 'justified_absent'
+    status = CharField(default='present')
 
     class Meta:
         table_name = 'attendance'
@@ -108,7 +108,7 @@ class GeneralReport(BaseModel):
 class Notification(BaseModel):
     recipient = ForeignKeyField(User, backref='notifications')
     message = TextField()
-    link = CharField(null=True) # Optional URL for the notification
+    link = CharField(null=True)
     is_read = BooleanField(default=False)
     timestamp = DateTimeField(default=datetime.datetime.now)
 

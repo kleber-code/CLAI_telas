@@ -3,9 +3,6 @@ from peewee import DoesNotExist
 import datetime
 
 def create_notification(recipient_id, message, link=None):
-    """
-    Creates a new notification for a given user.
-    """
     try:
         recipient = User.get(User.id == recipient_id)
         Notification.create(
@@ -23,9 +20,6 @@ def create_notification(recipient_id, message, link=None):
         return False
 
 def get_unread_notifications(user_id):
-    """
-    Fetches all unread notifications for a specific user.
-    """
     try:
         return Notification.select().where(
             (Notification.recipient == user_id) & (Notification.is_read == False)
@@ -35,9 +29,6 @@ def get_unread_notifications(user_id):
         return []
 
 def get_all_notifications(user_id):
-    """
-    Fetches all notifications for a specific user.
-    """
     try:
         return Notification.select().where(
             Notification.recipient == user_id
@@ -47,9 +38,6 @@ def get_all_notifications(user_id):
         return []
 
 def mark_notification_as_read(notification_id):
-    """
-    Marks a specific notification as read.
-    """
     try:
         notification = Notification.get(Notification.id == notification_id)
         notification.is_read = True
@@ -63,9 +51,6 @@ def mark_notification_as_read(notification_id):
         return False
 
 def mark_all_notifications_as_read(user_id):
-    """
-    Marks all notifications for a specific user as read.
-    """
     try:
         notifications = Notification.select().where(
             (Notification.recipient == user_id) & (Notification.is_read == False)

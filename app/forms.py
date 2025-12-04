@@ -10,16 +10,11 @@ from app.models import User, Student
 from config import Config
 
 def validate_cpf_number(cpf_raw):
-    """
-    Valida um número de CPF.
-    Remove caracteres não numéricos e verifica os dígitos verificadores.
-    """
     cpf = ''.join(filter(str.isdigit, cpf_raw))
 
     if not cpf or len(cpf) != 11 or cpf == cpf[0] * 11:
         return False
 
-    # Valida o primeiro dígito verificador
     sum_digits = 0
     for i in range(9):
         sum_digits += int(cpf[i]) * (10 - i)
@@ -29,7 +24,6 @@ def validate_cpf_number(cpf_raw):
     if first_verifier_digit != int(cpf[9]):
         return False
 
-    # Valida o segundo dígito verificador
     sum_digits = 0
     for i in range(10):
         sum_digits += int(cpf[i]) * (11 - i)
@@ -122,7 +116,7 @@ class UserForm(FlaskForm):
     def validate_cpf(self, field):
         if not validate_cpf_number(field.data):
             raise ValidationError('CPF inválido.')
-        user = User.select().where(User.username == field.data).first() # Still checking 'username' column in DB
+        user = User.select().where(User.username == field.data).first()
         if user:
             raise ValidationError('Este CPF já está cadastrado.')
 
@@ -155,7 +149,7 @@ class UpdateUserForm(FlaskForm):
         if not validate_cpf_number(field.data):
             raise ValidationError('CPF inválido.')
         if field.data != self.original_cpf:
-            user = User.select().where(User.username == field.data).first() # Still checking 'username' column in DB
+            user = User.select().where(User.username == field.data).first()
             if user:
                 raise ValidationError('Este CPF já está em uso por outro usuário.')
 

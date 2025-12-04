@@ -1,50 +1,50 @@
-/* --- VARIÁVEIS E FUNDAMENTOS GLOBAIS --- */
+
 :root {
-    /* Tipografia */
+    
     --font-main: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     
-    /* Dimensões */
+    
     --sidebar-width: 280px;
     --topbar-height: 72px;
     --border-radius-lg: 0.75rem;
     --border-radius-sm: 0.375rem;
 
-    /* Sombras Profissionais (Soft Shadows) */
+    
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
     
-    /* Transições */
+    
     --transition-speed: 0.25s;
     --transition-curve: cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-/* --- LIGHT THEME (Padrão) --- */
-html[data-bs-theme="light"] {
-    /* Cores Principais Customizadas */
-    --bs-primary: #0d6efd; /* Azul Default do Bootstrap */
-    --bs-secondary: #3b4a59; /* Azul Cinzento - Para elementos secundários, como textos muted, etc. */
 
-    /* Redefinindo semantic colors to adhere to 2-3 color rule (using shades of primary/neutral) */
+html[data-bs-theme="light"] {
+    
+    --bs-primary: #0d6efd; 
+    --bs-secondary: #3b4a59; 
+
+    
     --bs-success: #28a745;
     --bs-info: #17a2b8;
     --bs-warning: #ffc107;
     --bs-danger: #dc3545;
 
-    --bs-light: #f8f9fa;   /* Muito claro, quase branco */
-    /* Neutros / Tons Azuis Acinzentados Customizados para a UI geral */
-    --bs-body-bg: #eef2f6;      /* Fundo principal da página (azul claro sutil) */
-    --bs-body-color: #4a5568;   /* Cor do texto principal (azul acinzentado escuro) */
-    --bs-secondary-color: #718096; /* Cor do texto secundário/ícones (azul acinzentado médio) */
-    --bs-tertiary-bg: #e2e8f0;  /* Fundo para hover, tabelas, cards (azul acinzentado claro) */
-    --bs-border-color: #cbd5e0; /* Cor da borda (azul acinzentado muito claro) */
+    --bs-light: #f8f9fa;   
     
-    --bs-dark: #2d3748;    /* Tom mais escuro de azul acinzentado */
-    /* Para cálculo de RGBA */
+    --bs-body-bg: #eef2f6;      
+    --bs-body-color: #4a5568;   
+    --bs-secondary-color: #718096; 
+    --bs-tertiary-bg: #e2e8f0;  
+    --bs-border-color: #cbd5e0; 
+    
+    --bs-dark: #2d3748;    
+    
     --bs-primary-rgb: 13, 110, 253;
     --bs-secondary-rgb: 59, 74, 89;
 
-    /* RGB for the remapped semantic colors */
+    
     --bs-success-rgb: 40, 167, 69;
     --bs-info-rgb: 23, 162, 184;
     --bs-warning-rgb: 255, 193, 7;
@@ -53,42 +53,42 @@ html[data-bs-theme="light"] {
     --bs-light-rgb: 248, 249, 250;
     --bs-dark-rgb: 52, 58, 64;
 
-    /* Alert / Status Colors - Now using much more muted tones, leveraging neutrals and primary/secondary */
-    --bs-success-bg-subtle: var(--bs-body-bg); /* Very light background for success */
-    --bs-success-border-subtle: var(--bs-border-color);
-    --bs-success-text-emphasis: var(--bs-primary); /* Text is primary dark blue */
-
-    --bs-danger-bg-subtle: #f8d7da; /* Keeping a subtle light red for immediate critical error recognition */
-    --bs-danger-border-subtle: #f5c2c7;
-    --bs-danger-text-emphasis: #842029; /* Darker red text */
-
-    --bs-warning-bg-subtle: var(--bs-tertiary-bg); /* Light grey for warning background */
-    --bs-warning-border-subtle: var(--bs-border-color);
-    --bs-warning-text-emphasis: var(--bs-secondary); /* Text is secondary blue-grey */
     
-    --bs-info-bg-subtle: var(--bs-body-bg); /* Very light background for info */
+    --bs-success-bg-subtle: var(--bs-body-bg); 
+    --bs-success-border-subtle: var(--bs-border-color);
+    --bs-success-text-emphasis: var(--bs-primary); 
+
+    --bs-danger-bg-subtle: #f8d7da; 
+    --bs-danger-border-subtle: #f5c2c7;
+    --bs-danger-text-emphasis: #842029; 
+
+    --bs-warning-bg-subtle: var(--bs-tertiary-bg); 
+    --bs-warning-border-subtle: var(--bs-border-color);
+    --bs-warning-text-emphasis: var(--bs-secondary); 
+    
+    --bs-info-bg-subtle: var(--bs-body-bg); 
     --bs-info-border-subtle: var(--bs-border-color);
-    --bs-info-text-emphasis: var(--bs-secondary); /* Text is secondary blue-grey */
+    --bs-info-text-emphasis: var(--bs-secondary); 
 }
 
-/* --- DARK THEME --- */
+
 html[data-bs-theme="dark"] {
-    --bs-primary: #5d9cec; /* Light blue for primary in dark mode */
-    --bs-secondary: #a0aec0; /* Lighter grey for secondary */
+    --bs-primary: #5d9cec; 
+    --bs-secondary: #a0aec0; 
 
     --bs-success: #66bb6a;
     --bs-info: #42a5f5;
     --bs-warning: #ffa726;
     --bs-danger: #ef5350;
 
-    --bs-light: #4a5568;   /* Darker grey for 'light' in dark mode */
-    --bs-body-bg: #1a202c;      /* Very dark background */
-    --bs-body-color: #e2e8f0;   /* Light text */
-    --bs-secondary-color: #a0aec0; /* Medium grey for secondary text/icons */
-    --bs-tertiary-bg: #2d3748;  /* Darker grey for cards, hover */
-    --bs-border-color: #4a5568; /* Darker border color */
+    --bs-light: #4a5568;   
+    --bs-body-bg: #1a202c;      
+    --bs-body-color: #e2e8f0;   
+    --bs-secondary-color: #a0aec0; 
+    --bs-tertiary-bg: #2d3748;  
+    --bs-border-color: #4a5568; 
     
-    --bs-dark: #cbd5e0;    /* Lighter tone for 'dark' in dark mode */
+    --bs-dark: #cbd5e0;    
 
     --bs-primary-rgb: 93, 156, 236;
     --bs-secondary-rgb: 160, 174, 192;
@@ -100,20 +100,20 @@ html[data-bs-theme="dark"] {
     --bs-light-rgb: 74, 85, 104;
     --bs-dark-rgb: 203, 213, 224;
 
-    /* Alert / Status Colors for Dark Theme */
-    --bs-success-bg-subtle: #1f3d20; /* Darker green background */
+    
+    --bs-success-bg-subtle: #1f3d20; 
     --bs-success-border-subtle: #4c6a4e;
     --bs-success-text-emphasis: #c3e6cb;
 
-    --bs-danger-bg-subtle: #492828; /* Darker red background */
+    --bs-danger-bg-subtle: #492828; 
     --bs-danger-border-subtle: #723e3e;
     --bs-danger-text-emphasis: #f5c6cb;
 
-    --bs-warning-bg-subtle: #4a3e20; /* Darker orange background */
+    --bs-warning-bg-subtle: #4a3e20; 
     --bs-warning-border-subtle: #715b3a;
     --bs-warning-text-emphasis: #ffeeba;
     
-    --bs-info-bg-subtle: #203f4a; /* Darker info background */
+    --bs-info-bg-subtle: #203f4a; 
     --bs-info-border-subtle: #3a5d71;
     --bs-info-text-emphasis: #bee5eb;
 }
@@ -123,11 +123,11 @@ body {
     background-color: var(--bs-body-bg);
     color: var(--bs-body-color);
     overflow-x: hidden;
-    -webkit-font-smoothing: antialiased; /* Renderização de fonte nítida */
+    -webkit-font-smoothing: antialiased; 
     -moz-osx-font-smoothing: grayscale;
 }
 
-/* --- SCROLLBAR CUSTOMIZADA (Detalhe essencial) --- */
+
 ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
@@ -143,9 +143,9 @@ body {
     background: var(--bs-secondary-color);
 }
 
-/* --- LAYOUT ESTRUTURAL --- */
 
-/* Sidebar Fixa */
+
+
 #sidebar-wrapper {
     width: var(--sidebar-width);
     height: 100vh;
@@ -161,7 +161,7 @@ body {
     overflow: hidden;
 }
 
-/* Área de Conteúdo */
+
 #page-content-wrapper {
     width: 100%;
     min-height: 100vh;
@@ -170,7 +170,7 @@ body {
     background-color: var(--bs-tertiary-bg);
 }
 
-/* Navbar "Glass" */
+
 .main-navbar {
     height: var(--topbar-height);
     background: var(--bs-body-bg) !important;
@@ -182,34 +182,34 @@ body {
     right: 0;
     z-index: 999;
     transition: left var(--transition-speed) var(--transition-curve);
-    box-shadow: var(--shadow-sm); /* Sombra sutil apenas na navbar */
+    box-shadow: var(--shadow-sm); 
 }
 
-/* --- LÓGICA RESPONSIVA (Mantida e Refinada) --- */
 
-/* Mobile First (< 768px) */
+
+
 #sidebar-wrapper { transform: translateX(-100%); }
 #page-content-wrapper { margin-left: 0; }
 .main-navbar { left: 0; }
 
-/* Mobile Toggled (Aberto) */
+
 #wrapper.toggled #sidebar-wrapper { transform: translateX(0); box-shadow: var(--shadow-lg); }
 
-/* Desktop (>= 768px) */
+
 @media (min-width: 768px) {
     #sidebar-wrapper { transform: translateX(0); box-shadow: none; }
     #page-content-wrapper { margin-left: var(--sidebar-width); }
     .main-navbar { left: var(--sidebar-width); }
 
-    /* Desktop Toggled (Fechado) */
+    
     #wrapper.toggled #sidebar-wrapper { transform: translateX(-100%); }
     #wrapper.toggled #page-content-wrapper { margin-left: 0; }
     #wrapper.toggled .main-navbar { left: 0; }
 }
 
-/* --- COMPONENTES VISUAIS --- */
 
-/* Keyframes para animações */
+
+
 @keyframes pulse {
     0% { transform: scale(1); }
     50% { transform: scale(1.05); }
@@ -221,13 +221,13 @@ body {
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* Animações em Botões */
+
 .btn {
     transition: all var(--transition-speed) ease;
 }
 
 .btn:hover {
-    transform: translateY(-2px); /* Eleva o botão */
+    transform: translateY(-2px); 
     box-shadow: var(--shadow-md);
 }
 
@@ -235,7 +235,7 @@ body {
     animation: pulse 1.5s infinite;
 }
 
-/* Sidebar Menu Items */
+
 .list-group-item {
     border: none;
     padding: 0.75rem 1rem;
@@ -259,7 +259,7 @@ body {
 .list-group-item:hover {
     background-color: var(--bs-tertiary-bg) !important;
     color: var(--bs-body-color) !important;
-    transform: translateX(4px); /* Micro-interação */
+    transform: translateX(4px); 
 }
 
 .list-group-item.active {
@@ -268,13 +268,13 @@ body {
     box-shadow: var(--shadow-md);
 }
 
-/* Tabelas Profissionais (Clean Look) */
+
 .table-responsive {
     background: var(--bs-body-bg);
     border-radius: var(--border-radius-lg);
     box-shadow: var(--shadow-sm);
     border: 1px solid var(--bs-border-color);
-    padding: 0; /* Remove padding extra */
+    padding: 0; 
 }
 
 .table {
@@ -316,16 +316,16 @@ body {
 }
 
 .table tbody tr:last-child td {
-    border-bottom: none; /* Remove a borda da última linha */
+    border-bottom: none; 
 }
 
 .table tbody tr:hover {
-    background-color: var(--bs-tertiary-bg); /* Hover sutil */
+    background-color: var(--bs-tertiary-bg); 
     transform: scale(1.01);
     box-shadow: var(--shadow-md);
 }
 
-/* Cards (Container Padrão) */
+
 .card {
     border: 1px solid var(--bs-border-color);
     border-radius: var(--border-radius-lg);
@@ -336,8 +336,8 @@ body {
 }
 
 .card:hover {
-    transform: translateY(-5px) scale(1.02); /* Efeito de 'pop' */
-    box-shadow: var(--shadow-lg); /* Sombra mais pronunciada */
+    transform: translateY(-5px) scale(1.02); 
+    box-shadow: var(--shadow-lg); 
 }
 
 .card-header {
@@ -348,7 +348,7 @@ body {
     color: var(--bs-body-color);
 }
 
-/* Forms Modernizados */
+
 .form-control, .form-select {
     background-color: var(--bs-body-bg);
     border: 1px solid var(--bs-border-color);
@@ -360,7 +360,7 @@ body {
 
 .form-control:focus, .form-select:focus {
     border-color: var(--bs-primary);
-    box-shadow: 0 0 0 3px rgba(var(--bs-primary-rgb), 0.2); /* Ring mais visível */
+    box-shadow: 0 0 0 3px rgba(var(--bs-primary-rgb), 0.2); 
 }
 
 .form-label {
@@ -371,16 +371,16 @@ body {
 }
 
 
-/* FullCalendar (Correções Visuais) */
+
 .fc-theme-standard td, .fc-theme-standard th {
     border-color: var(--border-color);
 }
 .fc .fc-toolbar-title {
     font-size: 1.25rem;
-    color: var(--bs-primary); /* Changed from #344767 to primary variable */
+    color: var(--bs-primary); 
 }
 
-/* Custom styles for attendance status selects */
+
 .form-select.status-present {
     background-color: var(--bs-success-bg-subtle) !important;
     border-color: var(--bs-success-border-subtle) !important;
@@ -397,73 +397,30 @@ body {
     color: var(--bs-warning-text-emphasis) !important;
 }
 
-/* Custom Button Styles to adhere to 2-3 color scheme */
-.btn-success {
-    background-color: var(--bs-primary);
-    border-color: var(--bs-primary);
-    color: var(--bs-light);
-}
 
-.btn-success:hover {
-    background-color: var(--bs-secondary);
-    border-color: var(--bs-secondary);
-}
 
-.btn-info {
-    background-color: var(--bs-secondary);
-    border-color: var(--bs-secondary);
-    color: var(--bs-light);
-}
 
-.btn-info:hover {
-    background-color: var(--bs-primary);
-    border-color: var(--bs-primary);
-}
 
-.btn-warning {
-    background-color: var(--bs-secondary); /* Use secondary color for warning button */
-    border-color: var(--bs-secondary);
-    color: var(--bs-light);
-}
 
-.btn-warning:hover {
-    background-color: var(--bs-primary);
-    border-color: var(--bs-primary);
-}
-
-.btn-danger {
-    background-color: #8B0000; /* Dark red for critical actions */
-    border-color: #8B0000;
-    color: var(--bs-light);
-}
-
-.btn-danger:hover {
-    background-color: #A30000; /* Slightly lighter red on hover */
-    border-color: #A30000;
-}
-
-/* --- THEMES PERSONALIZADOS --- */
-
-/* High-Contrast Theme */
 html[data-bs-theme="high-contrast"] {
-    /* Main colors */
-    --bs-primary: #ffff00; /* Bright Yellow for primary accents */
-    --bs-secondary: #ffffff; /* Pure white for secondary elements */
-
-    --bs-success: #00ff00; /* Bright green */
-    --bs-info: #00ffff;    /* Bright cyan */
-    --bs-warning: #ff00ff; /* Magenta */
-    --bs-danger: #ff0000;  /* Pure red */
-
-    /* Backgrounds and text */
-    --bs-light: #222222;   /* Dark grey for elements often light */
-    --bs-body-bg: #000000;      /* Pure black background */
-    --bs-body-color: #ffffff;   /* Pure white text */
-    --bs-secondary-color: #ffffff; /* Secondary text also white */
-    --bs-tertiary-bg: #111111;  /* Very dark grey for cards, subtle backgrounds */
-    --bs-border-color: #ffffff; /* White border */
     
-    --bs-dark: #eeeeee;    /* Very light grey for elements often dark */
+    --bs-primary: #ffff00; 
+    --bs-secondary: #ffffff; 
+
+    --bs-success: #00ff00; 
+    --bs-info: #00ffff;    
+    --bs-warning: #ff00ff; 
+    --bs-danger: #ff0000;  
+
+    
+    --bs-light: #222222;   
+    --bs-body-bg: #000000;      
+    --bs-body-color: #ffffff;   
+    --bs-secondary-color: #ffffff; 
+    --bs-tertiary-bg: #111111;  
+    --bs-border-color: #ffffff; 
+    
+    --bs-dark: #eeeeee;    
 
     --bs-primary-rgb: 255, 255, 0;
     --bs-secondary-rgb: 255, 255, 255;
@@ -475,36 +432,36 @@ html[data-bs-theme="high-contrast"] {
     --bs-light-rgb: 34, 34, 34;
     --bs-dark-rgb: 238, 238, 238;
 
-    /* Alert / Status Colors for High Contrast Theme */
-    --bs-success-bg-subtle: #006600; /* Darker green background */
+    
+    --bs-success-bg-subtle: #006600; 
     --bs-success-border-subtle: #00cc00;
     --bs-success-text-emphasis: #00ff00;
 
-    --bs-danger-bg-subtle: #660000; /* Darker red background */
+    --bs-danger-bg-subtle: #660000; 
     --bs-danger-border-subtle: #ff0000;
     --bs-danger-text-emphasis: #ffaaaa;
 
-    --bs-warning-bg-subtle: #660066; /* Darker magenta background */
+    --bs-warning-bg-subtle: #660066; 
     --bs-warning-border-subtle: #ff00ff;
     --bs-warning-text-emphasis: #ffccff;
     
-    --bs-info-bg-subtle: #006666; /* Darker cyan background */
+    --bs-info-bg-subtle: #006666; 
     --bs-info-border-subtle: #00ffff;
     --bs-info-text-emphasis: #ccffff;
 
-    /* Adjustments for specific components to ensure contrast */
+    
     .list-group-item {
         color: var(--bs-secondary-color) !important;
         border: 1px solid var(--bs-border-color) !important;
         background-color: var(--bs-tertiary-bg) !important;
     }
     .list-group-item:hover {
-        background-color: var(--bs-primary) !important; /* Yellow background */
-        color: #000000 !important; /* Black text on yellow hover */
+        background-color: var(--bs-primary) !important; 
+        color: #000000 !important; 
     }
     .list-group-item.active {
-        background-color: var(--bs-primary) !important; /* Yellow background */
-        color: #000000 !important; /* Black text on yellow active */
+        background-color: var(--bs-primary) !important; 
+        color: #000000 !important; 
     }
 
     .card {
@@ -516,42 +473,42 @@ html[data-bs-theme="high-contrast"] {
         background-color: var(--bs-body-bg);
         border-bottom-color: var(--bs-border-color);
     }
-    /* Ensure text using primary color stands out */
+    
     .text-primary, a {
         color: var(--bs-primary) !important;
     }
     a:hover {
-        color: var(--bs-light) !important; /* White on hover */
+        color: var(--bs-light) !important; 
     }
 
     .form-control, .form-select {
-        background-color: #ffffff !important; /* White background */
-        color: #000000 !important; /* Black text */
-        font-weight: bold !important; /* Bold text */
-        border: 1px solid var(--bs-border-color); /* White border */
+        background-color: #ffffff !important; 
+        color: #000000 !important; 
+        font-weight: bold !important; 
+        border: 1px solid var(--bs-border-color); 
     }
     .form-control:focus, .form-select:focus {
-        box-shadow: 0 0 0 3px rgba(var(--bs-primary-rgb), 0.5); /* Yellow focus ring */
+        box-shadow: 0 0 0 3px rgba(var(--bs-primary-rgb), 0.5); 
     }
     .main-navbar {
-        background: var(--bs-body-bg) !important; /* Ensure navbar is black */
-        border-bottom: 1px solid var(--bs-border-color) !important; /* White border */
+        background: var(--bs-body-bg) !important; 
+        border-bottom: 1px solid var(--bs-border-color) !important; 
     }
 }
 
-/* Deuteranomaly Theme - Optimized for Red-Green Color Blindness */
+
 html[data-bs-theme="deuteranomaly"] {
-    /* Adjusting primary colors to ensure better distinction */
-    --bs-primary: #337ab7; /* A clear blue, distinct from problematic reds/greens */
-    --bs-secondary: #6c757d; /* Standard secondary */
+    
+    --bs-primary: #337ab7; 
+    --bs-secondary: #6c757d; 
 
-    /* Re-evaluating semantic colors for better distinction */
-    --bs-success: #3cb371; /* Medium Sea Green (more blue component than typical green) */
-    --bs-info: #17a2b8;    /* Keep original info blue */
-    --bs-warning: #ffb400; /* Orange-yellow, distinct from green */
-    --bs-danger: #cc3333;  /* A deeper, slightly desaturated red */
+    
+    --bs-success: #3cb371; 
+    --bs-info: #17a2b8;    
+    --bs-warning: #ffb400; 
+    --bs-danger: #cc3333;  
 
-    /* Backgrounds and text - aim for good contrast and readability */
+    
     --bs-light: #f8f9fa;
     --bs-body-bg: #f8f9fa;
     --bs-body-color: #212529;
@@ -570,7 +527,7 @@ html[data-bs-theme="deuteranomaly"] {
     --bs-light-rgb: 248, 249, 250;
     --bs-dark-rgb: 52, 58, 64;
 
-    /* Alert / Status Colors for Deuteranomaly Theme */
+    
     --bs-success-bg-subtle: #d4edda;
     --bs-success-border-subtle: #c3e6cb;
     --bs-success-text-emphasis: #155724;
@@ -588,39 +545,44 @@ html[data-bs-theme="deuteranomaly"] {
     --bs-info-text-emphasis: #0c5460;
 }
 
-/* Accessible Reading Mode */
-html[data-bs-theme="accessible-reading"] {
-    --bs-primary: #000000; /* Black for primary accents */
-    --bs-secondary: #333333; /* Dark gray for secondary accents */
+html[data-bs-theme="high-contrast"] .card, 
+html[data-bs-theme="high-contrast"] .card-header {
+    color: black !important;
+}
 
-    --bs-body-bg: #f8f8f8; /* Very light gray background */
-    --bs-body-color: #000000; /* Pure black text */
-    --bs-secondary-color: #333333; /* Dark gray for secondary text/icons */
-    --bs-tertiary-bg: #e5e5e5; /* Slightly darker light gray for hover/cards */
-    --bs-border-color: #cccccc; /* Medium gray for borders */
+
+html[data-bs-theme="accessible-reading"] {
+    --bs-primary: #000000; 
+    --bs-secondary: #333333; 
+
+    --bs-body-bg: #f8f8f8; 
+    --bs-body-color: #000000; 
+    --bs-secondary-color: #333333; 
+    --bs-tertiary-bg: #e5e5e5; 
+    --bs-border-color: #cccccc; 
     
-    /* Semantic colors for alerts in accessible mode - simplified */
-    --bs-success-bg-subtle: #d4edda; /* Light green */
+    
+    --bs-success-bg-subtle: #d4edda; 
     --bs-success-border-subtle: #c3e6cb;
     --bs-success-text-emphasis: #155724;
 
-    --bs-danger-bg-subtle: #f8d7da; /* Light red */
+    --bs-danger-bg-subtle: #f8d7da; 
     --bs-danger-border-subtle: #f5c2c7;
     --bs-danger-text-emphasis: #842029;
 
-    --bs-warning-bg-subtle: #fff3cd; /* Light yellow */
+    --bs-warning-bg-subtle: #fff3cd; 
     --bs-warning-border-subtle: #ffeeba;
     --bs-warning-text-emphasis: #664d03;
 
-    --bs-info-bg-subtle: #cff4fc; /* Light blue */
+    --bs-info-bg-subtle: #cff4fc; 
     --bs-info-border-subtle: #b6effb;
     --bs-info-text-emphasis: #055160;
 }
 
-/* Specific adjustments for accessible reading mode */
+
 html[data-bs-theme="accessible-reading"] body {
-    font-size: 1.15rem; /* Larger base font size */
-    line-height: 1.8;   /* Increased line height for readability */
+    font-size: 1.15rem; 
+    line-height: 1.8;   
 }
 
 html[data-bs-theme="accessible-reading"] .h1,
@@ -635,13 +597,13 @@ html[data-bs-theme="accessible-reading"] h3,
 html[data-bs-theme="accessible-reading"] h4,
 html[data-bs-theme="accessible-reading"] h5,
 html[data-bs-theme="accessible-reading"] h6 {
-    line-height: 1.4; /* Adjust heading line heights */
+    line-height: 1.4; 
 }
 
-/* Ensure sufficient contrast for sidebar active items and buttons */
+
 html[data-bs-theme="accessible-reading"] .list-group-item.active {
     background-color: var(--bs-primary) !important;
-    color: var(--bs-body-bg) !important; /* White text on black primary */
+    color: var(--bs-body-bg) !important; 
 }
 
 html[data-bs-theme="accessible-reading"] .btn-primary,
@@ -650,7 +612,7 @@ html[data-bs-theme="accessible-reading"] .btn-info,
 html[data-bs-theme="accessible-reading"] .btn-warning {
     background-color: var(--bs-primary) !important;
     border-color: var(--bs-primary) !important;
-    color: var(--bs-body-bg) !important; /* White text on black buttons */
+    color: var(--bs-body-bg) !important; 
 }
 
 html[data-bs-theme="accessible-reading"] .btn-primary:hover,
@@ -663,7 +625,7 @@ html[data-bs-theme="accessible-reading"] .btn-warning:hover {
 }
 
 html[data-bs-theme="accessible-reading"] .btn-danger {
-    background-color: #CC0000 !important; /* Strong red for danger */
+    background-color: #CC0000 !important; 
     border-color: #CC0000 !important;
     color: var(--bs-body-bg) !important;
 }

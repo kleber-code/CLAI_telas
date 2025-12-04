@@ -8,7 +8,6 @@ app = create_app()
 
 @app.cli.command('init_db')
 def init_db_command():
-    """Initializes the database tables and creates a default admin user."""
     create_tables()
     print("Database tables created.")
 

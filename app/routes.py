@@ -19,9 +19,7 @@ from PIL import Image
 from config import Config
 
 bp = Blueprint('main', __name__)
-# ... existing code ...
 
-# Notification Routes
 @bp.route('/notifications')
 @login_required
 def list_notifications():
