@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} - CLAI{% endblock %}
+
+{% block page_heading %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="row my-4">
+    <div class="col-md-8 mx-auto">
+        <div class="card shadow mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Detalhes do Relatório Diário</h5>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-4">Aluno:</dt>
+                    <dd class="col-sm-8"><a href="{{ url_for('main.student_detail', student_id=report.student.id) }}">{{ report.student.name }}</a></dd>
+
+                    <dt class="col-sm-4">Data:</dt>
+                    <dd class="col-sm-8">{{ report.date.strftime('%d/%m/%Y') }}</dd>
+
+                    <dt class="col-sm-4">Pedagoga:</dt>
+                    <dd class="col-sm-8">{{ report.pedagogue.name }}</dd>
+                    
+                    <dt class="col-sm-4">Papel do Profissional:</dt>
+                    <dd class="col-sm-8">{{ report.professional_role }}</dd>
+
+                    <dt class="col-sm-4">Turno:</dt>
+                    <dd class="col-sm-8">{{ report.shift }}</dd>
+
+                    <dt class="col-sm-4">Tipo de Atividade:</dt>
+                    <dd class="col-sm-8">{{ activity_choices_map.get(report.activity_type, report.activity_type) }}</dd>
+                </dl>
+
+                <hr class="my-4">
+
+                <h6 class="text-primary mb-3">Detalhes do Registro:</h6>
+                <p><strong>Dificuldades Encontradas:</strong></p>
+                <p class="border p-3 rounded bg-light">{{ report.difficulties if report.difficulties else 'N/A' }}</p>
+
+                <p class="mt-4"><strong>Medidas Tomadas:</strong></p>
+                <p class="border p-3 rounded bg-light">{{ report.actions_taken if report.actions_taken else 'N/A' }}</p>
+
+                <p class="mt-4"><strong>Participação de Outros Profissionais:</strong></p>
+                <p class="border p-3 rounded bg-light">{{ report.participants if report.participants else 'N/A' }}</p>
+
+                <p class="mt-4"><strong>Observações:</strong></p>
+                <p class="border p-3 rounded bg-light">{{ report.observations if report.observations else 'N/A' }}</p>
+                
+                <div class="mt-4 d-flex justify-content-end gap-2">
+                    <a href="{{ url_for('main.list_daily_reports') }}" class="btn btn-secondary"><i class="fas fa-arrow-left me-2"></i>Voltar</a>
+                    <a href="{{ url_for('main.edit_daily_report', report_id=report.id) }}" class="btn btn-primary"><i class="fas fa-edit me-2"></i>Editar</a>
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal-{{ report.id }}">
+                        <i class="fas fa-trash-alt me-2"></i>Excluir
+                    </button>
+                    <button onclick="window.print();" class="btn btn-info"><i class="fas fa-print me-2"></i>Imprimir</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal-{{ report.id }}" tabindex="-1" aria-labelledby="deleteModalLabel-{{ report.id }}" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel-{{ report.id }}">Confirmar Exclusão</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Tem certeza de que deseja excluir este relatório diário? Esta ação não pode ser desfeita.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <form action="{{ url_for('main.delete_daily_report', report_id=report.id) }}" method="POST" class="d-inline">
+          <button type="submit" class="btn btn-danger">Excluir</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

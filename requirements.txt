@@ -7,3 +7,4 @@ Flask-Bcrypt
 pillow
 Faker
 email_validator
+cpf

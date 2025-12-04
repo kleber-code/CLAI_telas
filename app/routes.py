@@ -1,28 +1,105 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request, Response, jsonify
+from flask import Blueprint, render_template, redirect, url_for, flash, request, Response, jsonify, send_from_directory
 from flask_login import login_user, logout_user, current_user, login_required
-from app import bcrypt  # Import bcrypt from app package
-from app.models import User, Student, Observation, Event, DailyLog, Attendance
+from app import bcrypt
+from app.models import User, Student, Observation, Event, Attendance, DailyReport, GeneralReport, Notification
 import peewee
 from app.forms import (
     LoginForm, StudentForm, UserForm, UpdateUserForm, ObservationForm,
-    ReportForm, EventForm, DailyLogForm, ProfileForm, AttendanceForm
+    EventForm, ProfileForm, AttendanceForm, DailyReportForm, GeneralReportForm,
+    ChangePasswordForm, AdminSetPasswordForm
+)
+from app.notification_utils import (
+    get_unread_notifications, get_all_notifications,
+    mark_notification_as_read, mark_all_notifications_as_read
 )
 from functools import wraps
 import datetime
 import os
 from PIL import Image
-from config import Config # Import Config to access activity choices
-
+from config import Config
 
 bp = Blueprint('main', __name__)
+# ... existing code ...
 
+# Notification Routes
+@bp.route('/notifications')
+@login_required
+def list_notifications():
+    page = request.args.get('page', 1, type=int)
+    per_page = Config.PAGINATION_PER_PAGE
+
+    notifications_query = get_all_notifications(current_user.id)
+    
+    total_notifications = notifications_query.count()
+    total_pages = (total_notifications + per_page - 1) // per_page
+    
+    notifications = notifications_query.paginate(page, per_page)
+
+    paginator = {
+        'page': page,
+        'total_pages': total_pages,
+        'route': 'main.list_notifications',
+        'args': {}
+    }
+    
+    return render_template(
+        'notifications/list_notifications.html',
+        title='Notificações',
+        notifications=notifications,
+        paginator=paginator
+    )
+
+@bp.route('/notifications/mark-read/<int:notification_id>', methods=['POST'])
+@login_required
+def mark_notification_read(notification_id):
+    if mark_notification_as_read(notification_id):
+        flash('Notificação marcada como lida.', 'success')
+    else:
+        flash('Erro ao marcar notificação como lida.', 'danger')
+    
+    # Redirect to referer or default to notifications list
+    return redirect(request.referrer or url_for('main.list_notifications'))
+
+@bp.route('/notifications/mark-all-read', methods=['POST'])
+@login_required
+def mark_all_notifications_read():
+    if mark_all_notifications_as_read(current_user.id):
+        flash('Todas as notificações foram marcadas como lidas.', 'success')
+    else:
+        flash('Erro ao marcar todas as notificações como lidas.', 'danger')
+    return redirect(request.referrer or url_for('main.list_notifications'))
+
+@bp.route('/notifications/unread_count')
+@login_required
+def unread_notification_count():
+    count = get_unread_notifications(current_user.id).count()
+    return jsonify({'count': count})
+
+
+# PWA routes
+@bp.route('/service-worker.js')
+def service_worker():
+    return send_from_directory(os.path.join(bp.root_path, 'static'), 'service-worker.js')
+
+@bp.route('/offline')
+def offline():
+    return render_template('offline.html')
+
+@bp.app_template_filter('format_cpf')
+def format_cpf_filter(cpf_raw):
+    if not cpf_raw:
+        return ""
+    cpf = ''.join(filter(str.isdigit, cpf_raw))
+    if len(cpf) == 11:
+        return f"{cpf[0:3]}.{cpf[3:6]}.{cpf[6:9]}-{cpf[9:11]}"
+    return cpf # Return original if not 11 digits
 
 def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not current_user.is_authenticated or current_user.role != 'admin':
             flash('Você não tem permissão para acessar esta página.', 'danger')
-            return redirect(url_for('main.dashboard'))  # Redirect to dashboard or login
+            return redirect(url_for('main.dashboard'))
         return f(*args, **kwargs)
     return decorated_function
 
@@ -41,12 +118,11 @@ def save_picture(picture_file, upload_folder, output_size=(125, 125)):
     random_hex = os.urandom(8).hex()
     _, f_ext = os.path.splitext(picture_file.filename)
     picture_fn = random_hex + f_ext
-    # Define absolute path to save the picture
     picture_path = os.path.join(bp.root_path, 'static', 'img', upload_folder, picture_fn)
 
     i = Image.open(picture_file)
-    i.thumbnail(output_size)  # Resize image
-    i.save(picture_path)  # Save image
+    i.thumbnail(output_size)
+    i.save(picture_path)
 
     return picture_fn
 
@@ -59,7 +135,6 @@ def home():
     return redirect(url_for('main.login'))
 
 
-# No routes.py -> def login():
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
@@ -67,8 +142,6 @@ def login():
     
     form = LoginForm()
     if form.validate_on_submit():
-        # LÓGICA CORRIGIDA:
-        # Tenta achar um usuário onde o email OU o username (matricula) seja igual ao input
         identifier = form.login_id.data
         user = User.get_or_none((User.email == identifier) | (User.username == identifier))
         
@@ -110,7 +183,6 @@ def dashboard():
     upcoming_events_count = upcoming_events.count()
     recent_observations_count = recent_observations.count()
 
-    # Data for chart: students per course
     students_per_course = (
         Student.select(Student.course, peewee.fn.COUNT(Student.id).alias('count'))
         .group_by(Student.course)
@@ -125,7 +197,7 @@ def dashboard():
         student_count=student_count,
         upcoming_events_count=upcoming_events_count,
         recent_observations_count=recent_observations_count,
-        students=students,  # Pass students for the list view as well
+        students=students,
         chart_labels=chart_labels,
         chart_data=chart_data
     )
@@ -136,9 +208,7 @@ def profile():
     form = ProfileForm(obj=current_user)
     if form.validate_on_submit():
         try:
-            # Handle picture upload
             if form.picture.data:
-                # Delete old picture if not default
                 if current_user.profile_picture != 'default_profile.png':
                     old_picture_path = os.path.join(
                         bp.root_path, 'static', 'img', 'profile_pics',
@@ -160,7 +230,6 @@ def profile():
     elif request.method == 'GET':
         form.name.data = current_user.name
         form.email.data = current_user.email
-        # Construct image_file path for template
         image_file = url_for('static', filename='img/profile_pics/' + current_user.profile_picture)
         return render_template(
             'users/profile.html', title='Meu Perfil', form=form, image_file=image_file
@@ -230,9 +299,8 @@ def add_student():
     form = StudentForm()
     if form.validate_on_submit():
         try:
-            student_picture_file = 'default_student.png'  # Default if no picture uploaded
+            student_picture_file = 'default_student.png'
             if form.picture.data:
-                # Larger size for student pic
                 student_picture_file = save_picture(form.picture.data, 'student_pics', output_size=(200, 200))
 
             Student.create(
@@ -247,8 +315,8 @@ def add_student():
                 responsible_name=form.responsible_name.data,
                 responsible_phone=form.responsible_phone.data,
                 responsible_email=form.responsible_email.data,
-                pedagogue=current_user,  # Assign the current logged-in pedagogue
-                student_picture=student_picture_file  # Save the picture filename
+                pedagogue=current_user,
+                student_picture=student_picture_file
             )
             flash('Aluno adicionado com sucesso!', 'success')
             return redirect(url_for('main.list_students'))
@@ -259,19 +327,15 @@ def add_student():
 @bp.route('/students/<int:student_id>/edit', methods=['GET', 'POST'])
 @login_required
 def edit_student(student_id):
-    student = Student.get_or_none(
-        Student.id == student_id
-    )  # Fetch student regardless of pedagogue
+    student = Student.get_or_none(Student.id == student_id)
     if not student or (student.pedagogue != current_user and current_user.role != 'admin'):
         flash('Aluno não encontrado ou você não tem permissão para editá-lo.', 'danger')
         return redirect(url_for('main.list_students'))
 
-    form = StudentForm(obj=student)  # Populate form with existing student data
+    form = StudentForm(obj=student)
     if form.validate_on_submit():
         try:
-            # Handle picture upload
             if form.picture.data:
-                # Delete old picture if not default
                 if student.student_picture != 'default_student.png':
                     old_picture_path = os.path.join(
                         bp.root_path, 'static', 'img', 'student_pics',
@@ -280,7 +344,6 @@ def edit_student(student_id):
                     if os.path.exists(old_picture_path):
                         os.remove(old_picture_path)
                 
-                # Larger size for student pic
                 student_picture_file = save_picture(
                     form.picture.data, 'student_pics', output_size=(200, 200)
                 )
@@ -302,19 +365,14 @@ def edit_student(student_id):
             return redirect(url_for('main.list_students'))
         except Exception as e:
             flash(f'Erro ao atualizar aluno: {e}', 'danger')
-    elif request.method == 'GET':
-        # Populate form with current picture data (though FileField doesn't show current file)
-        pass  # The obj=student handles initial population
     
     return render_template('students/edit_student.html', title='Editar Aluno', form=form, student=student)
 
 @bp.route('/students/<int:student_id>/delete', methods=['POST'])
 @login_required
-@pedagogue_or_admin_required  # Only pedagogues or admins can delete
+@pedagogue_or_admin_required
 def delete_student(student_id):
-    student = Student.get_or_none(
-        Student.id == student_id
-    )  # Fetch student regardless of pedagogue
+    student = Student.get_or_none(Student.id == student_id)
     if not student or (student.pedagogue != current_user and current_user.role != 'admin'):
         flash('Aluno não encontrado ou você não tem permissão para excluí-lo.', 'danger')
     else:
@@ -328,9 +386,7 @@ def delete_student(student_id):
 @bp.route('/students/<int:student_id>')
 @login_required
 def student_detail(student_id):
-    student = Student.get_or_none(
-        Student.id == student_id
-    )  # Fetch student regardless of pedagogue
+    student = Student.get_or_none(Student.id == student_id)
     if not student or (student.pedagogue != current_user and current_user.role != 'admin'):
         flash('Aluno não encontrado ou você não tem permissão para visualizá-lo.', 'danger')
         return redirect(url_for('main.list_students'))
@@ -352,9 +408,7 @@ def student_detail(student_id):
 @login_required
 @pedagogue_or_admin_required
 def add_observation(student_id):
-    student = Student.get_or_none(
-        Student.id == student_id
-    )  # Fetch student regardless of pedagogue
+    student = Student.get_or_none(Student.id == student_id)
     if not student or (student.pedagogue != current_user and current_user.role != 'admin'):
         flash('Aluno não encontrado ou você não tem permissão para adicionar observações a ele.', 'danger')
         return redirect(url_for('main.list_students'))
@@ -366,7 +420,7 @@ def add_observation(student_id):
                 student=student,
                 pedagogue=current_user,
                 observation_text=form.observation_text.data,
-                justification=None  # No justification needed for initial creation
+                justification=None
             )
             flash('Observação adicionada com sucesso!', 'success')
             return redirect(url_for('main.student_detail', student_id=student.id))
@@ -380,17 +434,12 @@ def add_observation(student_id):
 @login_required
 @pedagogue_or_admin_required
 def edit_observation(student_id, observation_id):
-    student = Student.get_or_none(
-        Student.id == student_id
-    )  # Fetch student regardless of pedagogue
+    student = Student.get_or_none(Student.id == student_id)
     if not student or (student.pedagogue != current_user and current_user.role != 'admin'):
-        flash('Aluno não encontrado ou você não tem permissão para editá-lo.', 'danger')
+        flash('Aluno não encontrado.', 'danger')
         return redirect(url_for('main.list_students'))
 
-    observation = Observation.get_or_none(
-        Observation.id == observation_id,
-        Observation.student == student
-    )  # Fetch observation related to student
+    observation = Observation.get_or_none(Observation.id == observation_id, Observation.student == student)
     if not observation or (observation.pedagogue != current_user and current_user.role != 'admin'):
         flash('Observação não encontrada ou você não tem permissão para editá-la.', 'danger')
         return redirect(url_for('main.student_detail', student_id=student.id))
@@ -422,8 +471,6 @@ def edit_observation(student_id, observation_id):
         observation=observation
     )
 
-
-# ATTENDANCE ROUTES
 @bp.route('/attendance')
 @login_required
 def list_attendance():
@@ -433,7 +480,6 @@ def list_attendance():
     if current_user.role == 'admin':
         attendance_query = Attendance.select().order_by(Attendance.date.desc())
     else:
-        # Filter by students assigned to the current pedagogue
         pedagogue_students = Student.select().where(Student.pedagogue == current_user)
         attendance_query = Attendance.select().where(
             Attendance.student.in_(pedagogue_students)
@@ -463,7 +509,6 @@ def list_attendance():
 @pedagogue_or_admin_required
 def add_attendance():
     form = AttendanceForm()
-    # Limit student choices to those assigned to the current pedagogue or all for admin
     if current_user.role != 'admin':
         form.student_id.choices = [
             (s.id, s.name) for s in Student.select().where(Student.pedagogue == current_user)
@@ -472,7 +517,6 @@ def add_attendance():
     if form.validate_on_submit():
         try:
             student = Student.get_by_id(form.student_id.data)
-            # Security check: ensure the pedagogue is assigned to the student or is an admin
             if student.pedagogue != current_user and current_user.role != 'admin':
                 flash('Você não tem permissão para registrar frequência para este aluno.', 'danger')
                 return redirect(url_for('main.list_attendance'))
@@ -497,13 +541,11 @@ def edit_attendance(attendance_id):
         flash('Registro de frequência não encontrado.', 'danger')
         return redirect(url_for('main.list_attendance'))
     
-    # Security check: ensure the current user is an admin or the pedagogue assigned to the student
     if attendance.student.pedagogue != current_user and current_user.role != 'admin':
         flash('Você não tem permissão para editar este registro de frequência.', 'danger')
         return redirect(url_for('main.list_attendance'))
 
     form = AttendanceForm(obj=attendance)
-    # Limit student choices to those assigned to the current pedagogue or all for admin
     if current_user.role != 'admin':
         form.student_id.choices = [
             (s.id, s.name) for s in Student.select().where(Student.pedagogue == current_user)
@@ -513,7 +555,6 @@ def edit_attendance(attendance_id):
     
     if form.validate_on_submit():
         try:
-            # Re-check student permission in case it was changed in the form by an admin
             student = Student.get_by_id(form.student_id.data)
             if student.pedagogue != current_user and current_user.role != 'admin':
                 flash(
@@ -531,7 +572,6 @@ def edit_attendance(attendance_id):
         except Exception as e:
             flash(f'Erro ao atualizar registro de frequência: {e}', 'danger')
     
-    # Pre-populate student_id for GET request if not already set by obj=attendance
     if request.method == 'GET' and not form.student_id.data:
         form.student_id.data = attendance.student.id
 
@@ -546,7 +586,6 @@ def delete_attendance(attendance_id):
         flash('Registro de frequência não encontrado.', 'danger')
         return redirect(url_for('main.list_attendance'))
     
-    # Security check: ensure the current user is an admin or the pedagogue assigned to the student
     if attendance.student.pedagogue != current_user and current_user.role != 'admin':
         flash('Você não tem permissão para excluir este registro de frequência.', 'danger')
         return redirect(url_for('main.list_attendance'))
@@ -564,25 +603,19 @@ def delete_attendance(attendance_id):
 @login_required
 @pedagogue_or_admin_required
 def mark_attendance():
-    # Base query for students based on user role
     if current_user.role == 'admin':
         students_query = Student.select()
     else:
         students_query = Student.select().where(Student.pedagogue == current_user)
 
-    # Get distinct grades for the filter dropdown
-    # The list comprehension is used to handle None values and create a sorted list
     all_grades = sorted(list(set([s.grade for s in students_query if s.grade])))
 
-    # Get filters from request arguments
     selected_grade = request.args.get('grade', '')
     selected_date_str = request.args.get('date', datetime.date.today().isoformat())
     
-    # Apply grade filter if a grade is selected
     if selected_grade:
         students_query = students_query.where(Student.grade == selected_grade)
 
-    # Finalize the student list
     students = students_query.order_by(Student.name)
     
     try:
@@ -595,7 +628,6 @@ def mark_attendance():
     if request.method == 'POST':
         successful_updates = 0
         failed_updates = 0
-        # NOTE: We are iterating over the 'students' query which is already filtered
         for student in students:
             student_status = request.form.get(f'status_{student.id}')
             if student_status:
@@ -618,10 +650,8 @@ def mark_attendance():
         if failed_updates > 0:
             flash(f'Falha ao atualizar frequência para {failed_updates} alunos.', 'danger')
         
-        # Preserve filters on redirect
         return redirect(url_for('main.mark_attendance', date=selected_date_str, grade=selected_grade))
 
-    # For GET request, fetch existing attendance to pre-fill the form
     existing_attendance = {
         att.student.id: att.status 
         for att in Attendance.select().where(Attendance.date == selected_date, Attendance.student.in_(students))
@@ -646,7 +676,7 @@ def list_users():
     page = request.args.get('page', 1, type=int)
     per_page = Config.PAGINATION_PER_PAGE
 
-    users_query = User.select().order_by(User.name) # Assuming sorting by name
+    users_query = User.select().order_by(User.name)
     
     total_users = users_query.count()
     total_pages = (total_users + per_page - 1) // per_page
@@ -659,7 +689,13 @@ def list_users():
         'route': 'main.list_users',
         'args': {}
     }
-    return render_template('users/list_users.html', title='Gerenciar Usuários', users=users, paginator=paginator)
+    
+    role_map = {
+        'admin': 'Administrador',
+        'pedagogue': 'Pedagogo'
+    }
+    
+    return render_template('users/list_users.html', title='Gerenciar Usuários', users=users, paginator=paginator, role_map=role_map)
 
 
 @bp.route('/admin/users/new', methods=['GET', 'POST'])
@@ -672,7 +708,7 @@ def add_user():
             hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
             User.create(
                 name=form.name.data,
-                username=form.username.data,
+                username=form.cpf.data,
                 email=form.email.data,
                 password=hashed_password,
                 role=form.role.data
@@ -693,11 +729,11 @@ def edit_user(user_id):
         flash('Usuário não encontrado.', 'danger')
         return redirect(url_for('main.list_users'))
 
-    form = UpdateUserForm(obj=user)
+    form = UpdateUserForm(original_cpf=user.username, original_email=user.email, obj=user)
     if form.validate_on_submit():
         try:
             user.name = form.name.data
-            user.username = form.username.data
+            user.username = form.cpf.data
             user.email = form.email.data
             user.role = form.role.data
             user.save()
@@ -742,120 +778,339 @@ def delete_user(user_id):
             flash(f'Erro ao excluir usuário: {e}', 'danger')
     return redirect(url_for('main.list_users'))
 
-@bp.route('/reports/generate', methods=['GET', 'POST'])
+
+@bp.route('/general-reports')
 @login_required
-def generate_report():
-    form = ReportForm()
+def list_general_reports():
+    page = request.args.get('page', 1, type=int)
+    per_page = Config.PAGINATION_PER_PAGE
+    
+    selected_student_id = request.args.get('student_id', type=int)
+    selected_date_str = request.args.get('date', '')
+
+    if current_user.role == 'admin':
+        reports_query = GeneralReport.select().order_by(GeneralReport.date.desc())
+        students = Student.select().order_by(Student.name)
+    else:
+        reports_query = GeneralReport.select().where(GeneralReport.pedagogue == current_user).order_by(GeneralReport.date.desc())
+        students = Student.select().where(Student.pedagogue == current_user).order_by(Student.name)
+
+    if selected_student_id:
+        reports_query = reports_query.where(GeneralReport.student.id == selected_student_id)
+    
+    if selected_date_str:
+        try:
+            selected_date = datetime.datetime.strptime(selected_date_str, '%Y-%m-%d').date()
+            reports_query = reports_query.where(GeneralReport.date == selected_date)
+        except ValueError:
+            flash('Formato de data inválido. Use AAAA-MM-DD.', 'warning')
+
+    total_reports = reports_query.count()
+    total_pages = (total_reports + per_page - 1) // per_page
+    
+    reports = reports_query.paginate(page, per_page)
+
+    paginator_args = {}
+    if selected_student_id:
+        paginator_args['student_id'] = selected_student_id
+    if selected_date_str:
+        paginator_args['date'] = selected_date_str
+
+    paginator = {
+        'page': page,
+        'total_pages': total_pages,
+        'route': 'main.list_general_reports',
+        'args': paginator_args
+    }
+
+    return render_template(
+        'general_reports/list_general_reports.html',
+        title='Relatórios Gerais',
+        reports=reports,
+        paginator=paginator,
+        students=students,
+        selected_student_id=selected_student_id,
+        selected_date=selected_date_str
+    )
+
+@bp.route('/general-reports/new', methods=['GET', 'POST'])
+@login_required
+@pedagogue_or_admin_required
+def add_general_report():
+    form = GeneralReportForm()
     if form.validate_on_submit():
-        student_id = form.student_id.data
-        start_date = form.start_date.data
-        end_date = form.end_date.data
-        
-        # Pass data to the report view template
-        return redirect(
-            url_for(
-                'main.view_report',
-                student_id=student_id,
-                start_date=start_date.strftime('%Y-%m-%d'),
-                end_date=end_date.strftime('%Y-%m-%d')
+        try:
+            student = Student.get_by_id(form.student_id.data)
+            if student.pedagogue != current_user and current_user.role != 'admin':
+                flash('Você não tem permissão para criar um relatório para este aluno.', 'danger')
+                return redirect(url_for('main.list_general_reports'))
+
+            GeneralReport.create(
+                student=student,
+                pedagogue=current_user,
+                date=form.date.data,
+                location=form.location.data,
+                initial_conditions=form.initial_conditions.data,
+                difficulties_found=form.difficulties_found.data,
+                observed_abilities=form.observed_abilities.data,
+                activities_performed=form.activities_performed.data,
+                evolutions_observed=form.evolutions_observed.data,
+                adapted_assessments=form.adapted_assessments.data,
+                professional_impediments=form.professional_impediments.data,
+                solutions=form.solutions.data,
+                additional_information=form.additional_information.data
             )
-        )
-    return render_template('reports/report_form.html', title='Gerar Relatório', form=form)
+            flash('Relatório geral adicionado com sucesso!', 'success')
+            return redirect(url_for('main.list_general_reports'))
+        except Exception as e:
+            flash(f'Erro ao adicionar relatório geral: {e}', 'danger')
+    return render_template('general_reports/add_general_report.html', title='Novo Relatório Geral', form=form)
 
-@bp.route('/reports/view')
+
+@bp.route('/general-reports/<int:report_id>')
 @login_required
-def view_report():
-    student_id = request.args.get('student_id', type=int)
-    start_date_str = request.args.get('start_date')
-    end_date_str = request.args.get('end_date')
+def view_general_report(report_id):
+    report = GeneralReport.get_or_none(GeneralReport.id == report_id)
+    if not report or (report.pedagogue != current_user and current_user.role != 'admin'):
+        flash('Relatório geral não encontrado ou você não tem permissão para visualizá-lo.', 'danger')
+        return redirect(url_for('main.list_general_reports'))
 
-    if not all([student_id, start_date_str, end_date_str]):
-        flash('Parâmetros de relatório inválidos.', 'danger')
-        return redirect(url_for('main.generate_report'))
-    
-    start_date = datetime.datetime.strptime(start_date_str, '%Y-%m-%d').date()
-    end_date = datetime.datetime.strptime(end_date_str, '%Y-%m-%d').date()
-
-    student = Student.get_or_none(
-        Student.id == student_id
-    )  # Fetch student regardless of pedagogue
-    if not student or (student.pedagogue != current_user and current_user.role != 'admin'):
-        flash('Aluno não encontrado ou você não tem permissão para gerar relatórios para este aluno.', 'danger')
-        return redirect(url_for('main.generate_report'))
-    
-    observations = Observation.select().where(
-        (Observation.student == student) &
-        (Observation.date >= start_date) &
-        (Observation.date <= end_date)
-    ).order_by(Observation.date.desc())
-
-    # Calculate Summary Statistics
-    total_observations = observations.count()
-    report_duration_days = (end_date - start_date).days + 1  # Include start and end day
-
-    # Calculate observations per week/month
-    # Group observations by date to check unique days with observations
-    unique_observation_dates = set([obs.date for obs in observations])
-    days_with_observations = len(unique_observation_dates)
-    
-    avg_obs_per_day = total_observations / report_duration_days if report_duration_days > 0 else 0
-    
     return render_template(
-        'reports/report_view.html',
-        title=f'Relatório de {student.name}',
-        student=student,
-        observations=observations,
-        start_date=start_date,
-        end_date=end_date,
-        total_observations=total_observations,
-        report_duration_days=report_duration_days,
-        days_with_observations=days_with_observations,
-        avg_obs_per_day=f"{avg_obs_per_day:.2f}"
+        'general_reports/view_general_report.html',
+        title='Detalhes do Relatório Geral',
+        report=report
     )
 
-@bp.route('/reports/view_printable')
+
+@bp.route('/general-reports/<int:report_id>/edit', methods=['GET', 'POST'])
 @login_required
-def view_report_printable():
-    student_id = request.args.get('student_id', type=int)
-    start_date_str = request.args.get('start_date')
-    end_date_str = request.args.get('end_date')
+@pedagogue_or_admin_required
+def edit_general_report(report_id):
+    report = GeneralReport.get_or_none(GeneralReport.id == report_id)
+    if not report:
+        flash('Relatório geral não encontrado.', 'danger')
+        return redirect(url_for('main.list_general_reports'))
 
-    if not all([student_id, start_date_str, end_date_str]):
-        flash('Parâmetros de relatório inválidos para visualização.', 'danger')
-        return redirect(url_for('main.generate_report'))
+    if report.pedagogue != current_user and current_user.role != 'admin':
+        flash('Você não tem permissão para editar este relatório.', 'danger')
+        return redirect(url_for('main.list_general_reports'))
+
+    form = GeneralReportForm(obj=report)
+    if form.validate_on_submit():
+        try:
+            report.student = Student.get_by_id(form.student_id.data)
+            report.date = form.date.data
+            report.location = form.location.data
+            report.initial_conditions = form.initial_conditions.data
+            report.difficulties_found = form.difficulties_found.data
+            report.observed_abilities = form.observed_abilities.data
+            report.activities_performed = form.activities_performed.data
+            report.evolutions_observed = form.evolutions_observed.data
+            report.adapted_assessments = form.adapted_assessments.data
+            report.professional_impediments = form.professional_impediments.data
+            report.solutions = form.solutions.data
+            report.additional_information = form.additional_information.data
+            report.save()
+            flash('Relatório geral atualizado com sucesso!', 'success')
+            return redirect(url_for('main.list_general_reports'))
+        except Exception as e:
+            flash(f'Erro ao atualizar relatório geral: {e}', 'danger')
+
+    elif request.method == 'GET':
+        form.student_id.data = report.student.id
+
+    return render_template('general_reports/edit_general_report.html', title='Editar Relatório Geral', form=form, report=report)
+
+
+@bp.route('/general-reports/<int:report_id>/delete', methods=['POST'])
+@login_required
+@pedagogue_or_admin_required
+def delete_general_report(report_id):
+    report = GeneralReport.get_or_none(GeneralReport.id == report_id)
+    if not report:
+        flash('Relatório geral não encontrado.', 'danger')
+        return redirect(url_for('main.list_general_reports'))
+
+    if report.pedagogue != current_user and current_user.role != 'admin':
+        flash('Você não tem permissão para excluir este relatório.', 'danger')
+        return redirect(url_for('main.list_general_reports'))
+
+    try:
+        report.delete_instance()
+        flash('Relatório geral excluído com sucesso!', 'success')
+    except Exception as e:
+        flash(f'Erro ao excluir relatório: {e}', 'danger')
     
-    start_date = datetime.datetime.strptime(start_date_str, '%Y-%m-%d').date()
-    end_date = datetime.datetime.strptime(end_date_str, '%Y-%m-%d').date()
+    return redirect(url_for('main.list_general_reports'))
 
-    student = Student.get_or_none(
-        Student.id == student_id
-    )  # Fetch student regardless of pedagogue
-    if not student or (student.pedagogue != current_user and current_user.role != 'admin'):
-        flash('Aluno não encontrado ou você não tem permissão para gerar relatórios para este aluno.', 'danger')
-        return redirect(url_for('main.generate_report'))
+
+@bp.route('/daily-reports')
+@login_required
+def list_daily_reports():
+    page = request.args.get('page', 1, type=int)
+    per_page = Config.PAGINATION_PER_PAGE
     
-    observations = Observation.select().where(
-        (Observation.student == student) &
-        (Observation.date >= start_date) &
-        (Observation.date <= end_date)
-    ).order_by(Observation.date.desc())
+    selected_student_id = request.args.get('student_id', type=int)
+    selected_date_str = request.args.get('date', '')
 
-    # Render the report content to HTML
+    if current_user.role == 'admin':
+        reports_query = DailyReport.select().order_by(DailyReport.date.desc())
+        students = Student.select().order_by(Student.name)
+    else:
+        reports_query = DailyReport.select().where(DailyReport.pedagogue == current_user).order_by(DailyReport.date.desc())
+        students = Student.select().where(Student.pedagogue == current_user).order_by(Student.name)
+
+    if selected_student_id:
+        reports_query = reports_query.where(DailyReport.student == selected_student_id)
+    
+    if selected_date_str:
+        try:
+            selected_date = datetime.datetime.strptime(selected_date_str, '%Y-%m-%d').date()
+            reports_query = reports_query.where(DailyReport.date == selected_date)
+        except ValueError:
+            flash('Formato de data inválido. Use AAAA-MM-DD.', 'warning')
+
+    total_reports = reports_query.count()
+    total_pages = (total_reports + per_page - 1) // per_page
+    
+    reports = reports_query.paginate(page, per_page)
+
+    paginator_args = {}
+    if selected_student_id:
+        paginator_args['student_id'] = selected_student_id
+    if selected_date_str:
+        paginator_args['date'] = selected_date_str
+
+    paginator = {
+        'page': page,
+        'total_pages': total_pages,
+        'route': 'main.list_daily_reports',
+        'args': paginator_args
+    }
+    
+    activity_choices_map = {choice[0]: choice[1] for choice in Config.DAILY_LOG_ACTIVITY_CHOICES}
+
     return render_template(
-        'reports/report_pdf.html', # Keep using this template, but it will be rendered as HTML
-        title=f'Relatório de {student.name}',
-        student=student,
-        observations=observations,
-        start_date=start_date,
-        end_date=end_date,
-        now=datetime.datetime.now()
+        'daily_reports/list_daily_reports.html',
+        title='Relatórios Diários',
+        reports=reports,
+        paginator=paginator,
+        students=students,
+        selected_student_id=selected_student_id,
+        selected_date=selected_date_str,
+        activity_choices_map=activity_choices_map
     )
+
+@bp.route('/daily-reports/new', methods=['GET', 'POST'])
+@login_required
+@pedagogue_or_admin_required
+def add_daily_report():
+    form = DailyReportForm()
+    if form.validate_on_submit():
+        try:
+            student = Student.get_by_id(form.student_id.data)
+            if student.pedagogue != current_user and current_user.role != 'admin':
+                flash('Você não tem permissão para criar um diário para este aluno.', 'danger')
+                return redirect(url_for('main.list_daily_reports'))
+
+            DailyReport.create(
+                student=student,
+                pedagogue=current_user,
+                date=form.date.data,
+                professional_role=form.professional_role.data,
+                shift=', '.join(form.shift.data),
+                activity_type=form.activity_type.data,
+                difficulties=form.difficulties.data,
+                actions_taken=form.actions_taken.data,
+                participants=form.participants.data,
+                observations=form.observations.data
+            )
+            flash('Relatório diário adicionado com sucesso!', 'success')
+            return redirect(url_for('main.list_daily_reports'))
+        except Exception as e:
+            flash(f'Erro ao adicionar relatório diário: {e}', 'danger')
+    return render_template('daily_reports/add_daily_report.html', title='Novo Relatório Diário', form=form)
+
+@bp.route('/daily-reports/<int:report_id>')
+@login_required
+def view_daily_report(report_id):
+    report = DailyReport.get_or_none(DailyReport.id == report_id)
+    if not report or (report.pedagogue != current_user and current_user.role != 'admin'):
+        flash('Relatório diário não encontrado ou você não tem permissão para visualizá-lo.', 'danger')
+        return redirect(url_for('main.list_daily_reports'))
+    
+    activity_choices_map = {choice[0]: choice[1] for choice in Config.DAILY_LOG_ACTIVITY_CHOICES}
+
+    return render_template(
+        'daily_reports/view_daily_report.html',
+        title='Detalhes do Relatório Diário',
+        report=report,
+        activity_choices_map=activity_choices_map
+    )
+
+
+@bp.route('/daily-reports/<int:report_id>/edit', methods=['GET', 'POST'])
+@login_required
+def edit_daily_report(report_id):
+    report = DailyReport.get_or_none(DailyReport.id == report_id)
+    if not report:
+        flash('Relatório diário não encontrado.', 'danger')
+        return redirect(url_for('main.list_daily_reports'))
+
+    if report.pedagogue != current_user and current_user.role != 'admin':
+        flash('Você não tem permissão para editar este relatório.', 'danger')
+        return redirect(url_for('main.list_daily_reports'))
+
+    form = DailyReportForm(obj=report)
+    if form.validate_on_submit():
+        try:
+            report.student = Student.get_by_id(form.student_id.data)
+            report.date = form.date.data
+            report.professional_role = form.professional_role.data
+            report.shift = ', '.join(form.shift.data)
+            report.activity_type = form.activity_type.data
+            report.difficulties = form.difficulties.data
+            report.actions_taken = form.actions_taken.data
+            report.participants = form.participants.data
+            report.observations = form.observations.data
+            report.save()
+            flash('Relatório diário atualizado com sucesso!', 'success')
+            return redirect(url_for('main.list_daily_reports'))
+        except Exception as e:
+            flash(f'Erro ao atualizar relatório: {e}', 'danger')
+    
+    elif request.method == 'GET':
+        form.shift.data = report.shift.split(', ') if report.shift else []
+        form.activity_type.data = report.activity_type
+        form.student_id.data = report.student.id
+
+    return render_template('daily_reports/edit_daily_report.html', title='Editar Relatório Diário', form=form, report=report)
+
+
+@bp.route('/daily-reports/<int:report_id>/delete', methods=['POST'])
+@login_required
+def delete_daily_report(report_id):
+    report = DailyReport.get_or_none(DailyReport.id == report_id)
+    if not report:
+        flash('Relatório diário não encontrado.', 'danger')
+        return redirect(url_for('main.list_daily_reports'))
+
+    if report.pedagogue != current_user and current_user.role != 'admin':
+        flash('Você não tem permissão para excluir este relatório.', 'danger')
+        return redirect(url_for('main.list_daily_reports'))
+
+    try:
+        report.delete_instance()
+        flash('Relatório diário excluído com sucesso!', 'success')
+    except Exception as e:
+        flash(f'Erro ao excluir relatório: {e}', 'danger')
+    
+    return redirect(url_for('main.list_daily_reports'))
 
 
 @bp.route('/calendar')
 @login_required
 def calendar():
-    # events are fetched via calendar_api, no need to pass them here
     return render_template('calendar/calendar.html', title='Calendário')
 
 
@@ -874,7 +1129,7 @@ def calendar_api():
             'start': event.start_time.isoformat(),
             'end': event.end_time.isoformat(),
             'description': event.description,
-            'allDay': False  # Assuming events have specific times
+            'allDay': False
         })
     return jsonify(events_data)
 
@@ -882,17 +1137,14 @@ def calendar_api():
 @login_required
 def add_event():
     form = EventForm()
-    # Pre-fill start_time if provided in URL (from FullCalendar dateClick)
     if request.method == 'GET' and 'start_time' in request.args:
         start_time_str = request.args.get('start_time')
         try:
-            # Handle both date-only and datetime formats from FullCalendar
             if 'T' in start_time_str:
                 form.start_time.data = datetime.datetime.fromisoformat(start_time_str)
             else:
                 form.start_time.data = datetime.datetime.fromisoformat(start_time_str + 'T00:00:00')
             
-            # If start_time is set, also set end_time to start_time + 1 hour as a sensible default
             if form.start_time.data:
                 form.end_time.data = form.start_time.data + datetime.timedelta(hours=1)
 
@@ -919,7 +1171,7 @@ def add_event():
                 start_time=form.start_time.data,
                 end_time=form.end_time.data,
                 student=student,
-                pedagogue=current_user  # Assign the current user as the creator/owner of the event
+                pedagogue=current_user
             )
             flash('Evento adicionado com sucesso!', 'success')
             return redirect(url_for('main.calendar'))
@@ -936,16 +1188,15 @@ def edit_event(event_id):
         return redirect(url_for('main.calendar'))
 
     form = EventForm(obj=event)
-    # If it's an AJAX POST request (from eventDrop/eventResize), handle it differently
     if request.is_json:
         data = request.get_json()
         try:
             event.start_time = datetime.datetime.fromisoformat(
                 data['start_time'].replace('Z', '+00:00')
-            )  # Handle 'Z' for UTC
+            )
             event.end_time = datetime.datetime.fromisoformat(
                 data['end_time'].replace('Z', '+00:00')
-            )  # Handle 'Z' for UTC
+            )
             event.save()
             return jsonify({'status': 'success'})
         except Exception as e:
@@ -989,88 +1240,3 @@ def delete_event(event_id):
         except Exception as e:
             flash(f'Erro ao excluir evento: {e}', 'danger')
     return redirect(url_for('main.calendar'))
-
-@bp.route('/daily-logs')
-@login_required
-def list_daily_logs():
-    page = request.args.get('page', 1, type=int)
-    per_page = Config.PAGINATION_PER_PAGE
-
-    # Admin sees all, pedagogues see theirs
-    if current_user.role == 'admin':
-        logs_query = DailyLog.select().order_by(DailyLog.date.desc())
-    else:
-        logs_query = DailyLog.select().where(DailyLog.pedagogue == current_user).order_by(DailyLog.date.desc())
-
-    logs = logs_query.paginate(page, per_page)
-
-    # Calculate total pages for pagination display
-    total_logs = logs_query.count()
-    total_pages = (total_logs + per_page - 1) // per_page
-
-    # Create paginator object for the universal pagination macro
-    paginator = {
-        'page': page,
-        'total_pages': total_pages,
-        'route': 'main.list_daily_logs',
-        'args': {} # No additional args for now, but keeping it for future use (e.g., search)
-    }
-
-    # Create a mapping from activity_type value to label
-    activity_choices_map = {choice[0]: choice[1] for choice in Config.DAILY_LOG_ACTIVITY_CHOICES}
-
-    return render_template(
-        'daily_logs/list_logs.html',
-        title='Diários de Bordo',
-        logs=logs,
-        paginator=paginator, # Pass the paginator object
-        activity_choices_map=activity_choices_map
-    )
-
-
-@bp.route('/daily-logs/new', methods=['GET', 'POST'])
-@login_required
-@pedagogue_or_admin_required
-def add_daily_log():
-    form = DailyLogForm()
-    if form.validate_on_submit():
-        try:
-            student = Student.get_by_id(form.student_id.data)
-            # Security check: ensure the pedagogue is assigned to the student or is an admin
-            if student.pedagogue != current_user and current_user.role != 'admin':
-                flash('Você não tem permissão para criar um diário para este aluno.', 'danger')
-                return redirect(url_for('main.list_daily_logs'))
-
-            DailyLog.create(
-                student=student,
-                pedagogue=current_user,
-                date=form.date.data,
-                shift=', '.join(form.shift.data),  # Save multiple shifts as a string
-                activity_type=form.activity_type.data,
-                difficulties=form.difficulties.data,
-                actions_taken=form.actions_taken.data,
-                participants=form.participants.data
-            )
-            flash('Diário de bordo adicionado com sucesso!', 'success')
-            return redirect(url_for('main.list_daily_logs'))
-        except Exception as e:
-            flash(f'Erro ao adicionar diário: {e}', 'danger')
-    return render_template('daily_logs/add_log.html', title='Adicionar Diário de Bordo', form=form)
-
-
-@bp.route('/daily-logs/<int:log_id>')
-@login_required
-def daily_log_detail(log_id):
-    log = DailyLog.get_or_none(log_id)
-    if not log or (log.pedagogue != current_user and current_user.role != 'admin'):
-        flash('Registro de diário não encontrado ou você não tem permissão para visualizá-lo.', 'danger')
-        return redirect(url_for('main.list_daily_logs'))
-    # Create a mapping from activity_type value to label
-    activity_choices_map = {choice[0]: choice[1] for choice in Config.DAILY_LOG_ACTIVITY_CHOICES}
-
-    return render_template(
-        'daily_logs/daily_log_detail.html',
-        title='Detalhes do Diário de Bordo',
-        log=log,
-        activity_choices_map=activity_choices_map
-    )

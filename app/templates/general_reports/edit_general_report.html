@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% from 'macros/form_macros.html' import render_field %}
+
+{% block title %}Editar Relatório Geral{% endblock %}
+
+{% block page_heading %}Editar Relatório Geral{% endblock %}
+
+{% block content %}
+<div class="row my-4">
+    <div class="col-md-8 mx-auto">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Editando Relatório para: {{ report.student.name }}</h5>
+            </div>
+            <div class="card-body">
+                <p>Atualize as informações nos campos abaixo.</p>
+                <form method="POST" action="{{ url_for('main.edit_general_report', report_id=report.id) }}">
+                    {{ form.hidden_tag() }}
+                    
+                    {{ render_field(form.date) }}
+                    {{ render_field(form.location) }}
+                    {{ render_field(form.student_id) }}
+                    
+                    <h5 class="mt-4">Observações e intervenções realizadas com os aluno(a)</h5>
+                    {{ render_field(form.initial_conditions) }}
+                    {{ render_field(form.difficulties_found) }}
+                    {{ render_field(form.observed_abilities) }}
+                    {{ render_field(form.activities_performed) }}
+                    {{ render_field(form.evolutions_observed) }}
+
+                    <h5 class="mt-4">Observações e intervenções realizadas com os docentes</h5>
+                    {{ render_field(form.adapted_assessments) }}
+                    {{ render_field(form.professional_impediments) }}
+                    {{ render_field(form.solutions) }}
+                    {{ render_field(form.additional_information) }}
+
+                    <div class="d-grid mt-4">
+                        {{ form.submit(class="btn btn-primary w-100", value="Atualizar Relatório") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

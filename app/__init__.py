@@ -1,4 +1,3 @@
-# app/__init__.py
 from flask import Flask
 from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
@@ -19,15 +18,15 @@ def create_app(config_class=Config):
     login_manager.init_app(app)
     bcrypt.init_app(app)
 
-    # Peewee specific setup
     @app.before_request
     def before_request():
-        db.connect()
+        if db.is_closed():
+            db.connect()
 
-    @app.after_request
-    def after_request(response):
-        db.close()
-        return response
+    @app.teardown_appcontext
+    def teardown_db(exc):
+        if not db.is_closed():
+            db.close()
 
     @app.cli.command('init_db')
     def init_db_command():
@@ -35,12 +34,7 @@ def create_app(config_class=Config):
         create_tables()
         print("Database tables created.")
 
-        # --- WARNING: Default Admin User Creation for Development ONLY ---
-        # This block creates a default admin user if one doesn't exist.
-        # This SHOULD BE REMOVED or significantly secured (e.g., strong random password,
-        # one-time setup) for production deployments.
         if os.environ.get('FLASK_DEBUG') == '1': # Only create in debug/development mode
-            # Ensure app context is available for User model access
             with app.app_context():
                 if not User.select().where(User.email == 'admin@clai.com').exists():
                     hashed_password = bcrypt.generate_password_hash('admin').decode('utf-8')
@@ -54,7 +48,6 @@ def create_app(config_class=Config):
                     print("Default admin user created: admin@clai.com with password 'admin'")
                 else:
                     print("Admin user already exists.")
-        # --- END WARNING ---
 
     @login_manager.user_loader
     def load_user(user_id):
@@ -63,7 +56,6 @@ def create_app(config_class=Config):
         except User.DoesNotExist:
             return None
 
-    # Register blueprints here
     from app import routes
     @app.context_processor
     def inject_config():

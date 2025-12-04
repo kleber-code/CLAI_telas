@@ -7,7 +7,7 @@
 {% block content %}
 <div class="row my-4">
     <div class="col-md-8 mx-auto">
-        <div class="card shadow">
+        <div class="card shadow animate__animated animate__fadeInUp">
             <div class="card-header bg-primary text-white">
                 <h5 class="mb-0">Formulário de Cadastro de Usuário</h5>
             </div>
@@ -22,14 +22,14 @@
                     {% endif %}
                 {% endwith %}
 
-                <form method="POST">
+                <form method="POST" id="add-user-form">
                     {{ form.hidden_tag() }}
                     <div class="row">
                         <div class="col-md-6">
                             {{ render_field(form.name) }}
                         </div>
                         <div class="col-md-6">
-                            {{ render_field(form.username) }}
+                            {{ render_field(form.cpf, id="cpf") }}
                         </div>
                     </div>
                     {{ render_field(form.email) }}
@@ -42,8 +42,11 @@
                         </div>
                     </div>
                     {{ render_field(form.role) }}
-                    <div class="d-grid gap-2">
-                        {{ render_submit_field(form.submit, extra_classes="w-100") }}
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg w-100" id="submit-button">
+                            <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                            Salvar Usuário
+                        </button>
                         <a href="{{ url_for('main.list_users') }}" class="btn btn-secondary w-100">Cancelar</a>
                     </div>
                 </form>
@@ -51,4 +54,21 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.getElementById('add-user-form').addEventListener('submit', function() {
+        const submitButton = document.getElementById('submit-button');
+        const spinner = submitButton.querySelector('.spinner-border');
+
+        submitButton.disabled = true;
+        spinner.classList.remove('d-none');
+        submitButton.querySelector('span:not(.spinner-border)').textContent = 'Salvando...';
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        setupCPFInput('cpf');
+    });
+</script>
 {% endblock %}

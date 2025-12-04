@@ -29,7 +29,7 @@
                             {{ render_field(form.name) }}
                         </div>
                         <div class="col-md-6">
-                            {{ render_field(form.username) }}
+                            {{ render_field(form.cpf, id="cpf") }}
                         </div>
                     </div>
                     {{ render_field(form.email) }}
@@ -44,4 +44,12 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        setupCPFInput('cpf');
+    });
+</script>
 {% endblock %}

@@ -21,9 +21,21 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.19/main.min.css' rel='stylesheet' />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/print.css') }}" media="print">
     <link rel="icon" href="/static/img/favicon.ico" type="image/x-icon">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.webmanifest') }}">
     <title>{% if title %}{{ title }} - {% endif %}CLAI | Dashboard</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/pace-js@latest/pace.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pace-js@latest/pace-theme-default.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.19/index.global.min.js"></script>
+
+    <script src="{{ url_for('static', filename='js/cpf_formatter.js') }}"></script>
+
     {% block head_extra %}{% endblock %}
 </head>
 
@@ -71,13 +83,16 @@
                 class="list-group-item list-group-item-action {% if request.endpoint == 'main.mark_attendance' %}active{% endif %}">
                 <i class="bi bi-check-square me-2"></i>Frequência
             </a>
-            <a href="{{ url_for('main.generate_report') }}"
-                class="list-group-item list-group-item-action {% if request.endpoint == 'main.generate_report' %}active{% endif %}">
-                <i class="bi bi-graph-up me-2"></i>Relatórios
+            <a href="{{ url_for('main.list_general_reports') }}"
+                class="list-group-item list-group-item-action {% if request.endpoint == 'main.list_general_reports' %}active{% endif %}">
+                <i class="bi bi-graph-up me-2"></i>Relatórios Gerais
             </a>
-            <a href="{{ url_for('main.list_daily_logs') }}"
-                class="list-group-item list-group-item-action {% if request.endpoint == 'main.list_daily_logs' %}active{% endif %}">
-                <i class="bi bi-journal-text me-2"></i>Diários
+            <a href="{{ url_for('main.list_daily_reports') }}"
+                class="list-group-item list-group-item-action {% if 'daily_report' in request.endpoint %}active{% endif %}">
+                <i class="bi bi-journal-text me-2"></i>Relatórios Diários
+            </a>
+            <a href="#" id="installButton" class="list-group-item list-group-item-action d-none" title="Instalar Aplicativo">
+                <i class="bi bi-cloud-download me-2"></i>Instalar App
             </a>
         </div>
 
@@ -99,6 +114,15 @@
                 <h1 class="h5 m-0 fw-semibold text-body">{% block page_heading %}Visão Geral{% endblock %}</h1>
 
                 <div class="ms-auto d-flex align-items-center gap-3">
+                    {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('main.list_notifications') }}" class="btn btn-link text-body-secondary p-0 position-relative" title="Notificações">
+                        <i class="bi bi-bell"></i>
+                        <span id="unread-notifications-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">
+                            0
+                            <span class="visually-hidden">unread notifications</span>
+                        </span>
+                    </a>
+                    {% endif %}
                     <button class="btn btn-link text-body-secondary p-0" id="theme-toggle" title="Alternar Tema">
                         <i class="bi bi-moon-stars"></i>
                     </button>
@@ -134,8 +158,6 @@
                             <li><a class="dropdown-item" href="{{ url_for('main.change_password') }}"><i
                                         class="bi bi-key me-2"></i>Alterar Senha</a>
                             </li>
-                            <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Configurações</a>
-                            </li>
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
@@ -166,7 +188,7 @@
         {% endif %}
         {% endwith %}
 
-        <main class="container-fluid px-4 py-4">
+        <main class="container-fluid px-4 py-4 animate__animated animate__fadeIn">
             {% block content %}
             <div class="alert alert-light border shadow-sm" role="alert">
                 <h4 class="alert-heading"><i class="bi bi-info-circle me-2"></i>Bem-vindo ao CLAI</h4>
@@ -183,8 +205,6 @@
     </div>
     {% endblock %}
 
-    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.19/index.global.min.js'></script>
-    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.19/locales/pt-br.js'></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const wrapper = document.getElementById("wrapper");
@@ -234,6 +254,82 @@
                     themeToggle.innerHTML = newTheme === 'light' ? '<i class="bi bi-moon-stars"></i>' : '<i class="bi bi-sun"></i>';
                 });
             }
+
+            // PWA Installation Logic
+            let deferredPrompt;
+            const installButton = document.getElementById('installButton');
+
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault(); // Prevent the mini-infobar from appearing
+                deferredPrompt = e; // Stash the event so it can be triggered later
+                if (installButton) {
+                    installButton.classList.remove('d-none'); // Show the install button
+                }
+            });
+
+            if (installButton) {
+                installButton.addEventListener('click', async () => {
+                    if (deferredPrompt) {
+                        deferredPrompt.prompt(); // Show the install prompt
+                        const { outcome } = await deferredPrompt.userChoice; // Wait for the user to respond to the prompt
+                        console.log(`User response to the install prompt: ${outcome}`); // Log the outcome
+                        if (outcome === 'accepted') {
+                            // User accepted the install prompt
+                            installButton.classList.add('d-none'); // Hide the install button if PWA is installed
+                        }
+                        deferredPrompt = null; // Clear the deferredPrompt
+                    }
+                });
+            }
+
+            // Optional: Hide the install button if the app is already installed
+            window.addEventListener('appinstalled', () => {
+                if (installButton) {
+                    installButton.classList.add('d-none');
+                }
+            });
+
+            // Register service worker
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('/static/service-worker.js')
+                        .then(registration => {
+                            console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                        })
+                        .catch(err => {
+                            console.log('ServiceWorker registration failed: ', err);
+                        });
+                });
+            }
+
+            // Notification count polling
+            {% if current_user.is_authenticated %}
+            const notificationBadge = document.getElementById('unread-notifications-badge');
+
+            async function fetchNotificationCount() {
+                try {
+                    const response = await fetch("{{ url_for('main.unread_notification_count') }}");
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.count > 0) {
+                            notificationBadge.textContent = data.count;
+                            notificationBadge.classList.remove('d-none');
+                        } else {
+                            notificationBadge.classList.add('d-none');
+                        }
+                    } else {
+                        console.error('Failed to fetch notification count:', response.statusText);
+                    }
+                } catch (error) {
+                    console.error('Error fetching notification count:', error);
+                }
+            }
+
+            // Fetch on page load
+            fetchNotificationCount();
+            // Poll every 60 seconds
+            setInterval(fetchNotificationCount, 60000); 
+            {% endif %}
         });
     </script>
     {% block scripts %}

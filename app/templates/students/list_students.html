@@ -7,7 +7,7 @@
 <div class="row my-4">
     <div class="col-md-12">
         <div class="d-flex justify-content-end mb-3">
-            <a href="{{ url_for('main.add_student') }}" class="btn btn-primary"><i class="bi bi-plus-circle me-1"></i> Adicionar Novo Aluno</a>
+            <a href="{{ url_for('main.add_student') }}" class="btn btn-primary">Adicionar Novo Aluno</a>
         </div>
 
         <div class="card shadow-sm mb-4">
@@ -16,7 +16,7 @@
                     <div class="input-group">
                         <input type="text" class="form-control" name="search" placeholder="Buscar por nome ou matrícula..." value="{{ search_query or '' }}">
                         <button class="btn btn-primary" type="submit">
-                            <i class="bi bi-search"></i> Buscar
+                            Buscar
                         </button>
                     </div>
                 </form>
@@ -45,6 +45,7 @@
                                 <th scope="col">Nome</th>
                                 <th scope="col">Matrícula</th>
                                 <th scope="col">Curso</th>
+                                <th scope="col">CPF do Responsável</th>
                                 <th scope="col">Ações</th>
                             </tr>
                         </thead>
@@ -54,11 +55,12 @@
                                 <td>{{ student.name }}</td>
                                 <td>{{ student.matricula }}</td>
                                 <td>{{ student.course }}</td>
+                                <td>{{ student.responsible_cpf | format_cpf if student.responsible_cpf else 'N/A' }}</td>
                                 <td>
-                                    <a href="{{ url_for('main.student_detail', student_id=student.id) }}" class="btn btn-info btn-sm" title="Ver Detalhes do Aluno">Ver Detalhes</a>
-                                    <a href="{{ url_for('main.edit_student', student_id=student.id) }}" class="btn btn-warning btn-sm" title="Editar Aluno">Editar</a>
+                                    <a href="{{ url_for('main.student_detail', student_id=student.id) }}" class="btn btn-primary btn-sm">Ver Detalhes</a>
+                                    <a href="{{ url_for('main.edit_student', student_id=student.id) }}" class="btn btn-warning btn-sm">Editar</a>
                                     <form action="{{ url_for('main.delete_student', student_id=student.id) }}" method="POST" style="display:inline;">
-                                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Tem certeza que deseja excluir este aluno?')" title="Excluir Aluno">Excluir</button>
+                                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Tem certeza que deseja excluir este aluno?')">Excluir</button>
                                     </form>
                                 </td>
                             </tr>

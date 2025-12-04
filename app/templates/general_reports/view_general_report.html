@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} - CLAI{% endblock %}
+
+{% block page_heading %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="row my-4">
+    <div class="col-md-8 mx-auto">
+        <div class="card shadow mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Detalhes do Relatório Geral</h5>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-4">Aluno:</dt>
+                    <dd class="col-sm-8"><a href="{{ url_for('main.student_detail', student_id=report.student.id) }}">{{ report.student.name }}</a></dd>
+
+                    <dt class="col-sm-4">Data:</dt>
+                    <dd class="col-sm-8">{{ report.date.strftime('%d/%m/%Y') }}</dd>
+
+                    <dt class="col-sm-4">Pedagoga:</dt>
+                    <dd class="col-sm-8">{{ report.pedagogue.name }}</dd>
+                    
+                    <dt class="col-sm-4">Local:</dt>
+                    <dd class="col-sm-8">{{ report.location }}</dd>
+                </dl>
+
+                <hr class="my-4">
+
+                <h5 class="mt-4">Observações e intervenções realizadas com os aluno(a)</h5>
+                <p><strong>Condições observadas do aluno no início da intervenção:</strong></p>
+                <p class="border p-3 rounded bg-light">{{ report.initial_conditions if report.initial_conditions else 'N/A' }}</p>
+
+                <p class="mt-4"><strong>Dificuldades encontradas:</strong></p>
+                <p class="border p-3 rounded bg-light">{{ report.difficulties_found if report.difficulties_found else 'N/A' }}</p>
+
+                <p class="mt-4"><strong>Habilidades observadas:</strong></p>
+                <p class="border p-3 rounded bg-light">{{ report.observed_abilities if report.observed_abilities else 'N/A' }}</p>
+
+                <p class="mt-4"><strong>Atividades realizadas:</strong></p>
+                <p class="border p-3 rounded bg-light">{{ report.activities_performed if report.activities_performed else 'N/A' }}</p>
+
+                <p class="mt-4"><strong>Evoluções observadas após o acompanhamento:</strong></p>
+                <p class="border p-3 rounded bg-light">{{ report.evolutions_observed if report.evolutions_observed else 'N/A' }}</p>
+
+
+                <h5 class="mt-4">Observações e intervenções realizadas com os docentes</h5>
+                <p><strong>Os professores fazem avaliações adaptadas, ler com o estudante?</strong></p>
+                <p class="border p-3 rounded bg-light">{{ 'Sim' if report.adapted_assessments else 'Não' }}</p>
+
+                <p class="mt-4"><strong>Dificuldades encontradas pelo profissional:</strong></p>
+                <p class="border p-3 rounded bg-light">{{ report.professional_impediments if report.professional_impediments else 'N/A' }}</p>
+
+                <p class="mt-4"><strong>Medidas tomadas para reduzir dificuldades:</strong></p>
+                <p class="border p-3 rounded bg-light">{{ report.solutions if report.solutions else 'N/A' }}</p>
+
+                <p class="mt-4"><strong>Informações adicionais referente ao semestre em curso:</strong></p>
+                <p class="border p-3 rounded bg-light">{{ report.additional_information if report.additional_information else 'N/A' }}</p>
+
+                <div class="mt-4 d-flex justify-content-end gap-2">
+                    <a href="{{ url_for('main.list_general_reports') }}" class="btn btn-secondary"><i class="fas fa-arrow-left me-2"></i>Voltar</a>
+                    <a href="{{ url_for('main.edit_general_report', report_id=report.id) }}" class="btn btn-primary"><i class="fas fa-edit me-2"></i>Editar</a>
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal-{{ report.id }}">
+                        <i class="fas fa-trash-alt me-2"></i>Excluir
+                    </button>
+                    <button onclick="window.print();" class="btn btn-info"><i class="fas fa-print me-2"></i>Imprimir</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal-{{ report.id }}" tabindex="-1" aria-labelledby="deleteModalLabel-{{ report.id }}" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel-{{ report.id }}">Confirmar Exclusão</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Tem certeza de que deseja excluir este relatório geral? Esta ação não pode ser desfeita.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <form action="{{ url_for('main.delete_general_report', report_id=report.id) }}" method="POST" class="d-inline">
+          <button type="submit" class="btn btn-danger">Excluir</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

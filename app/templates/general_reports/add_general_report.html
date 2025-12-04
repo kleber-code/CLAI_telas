@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% from 'macros/form_macros.html' import render_field %}
+
+{% block title %}Novo Relatório Geral{% endblock %}
+
+{% block page_heading %}Novo Relatório Geral{% endblock %}
+
+{% block content %}
+<div class="row my-4">
+    <div class="col-md-8 mx-auto">
+        <div class="card shadow animate__animated animate__fadeInUp">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Relatório semanal/mensal</h5>
+            </div>
+            <div class="card-body">
+                <p>Apresente as informações nos campos abaixo.</p>
+                <form method="POST" id="add-general-report-form">
+                    {{ form.hidden_tag() }}
+                    
+                    {{ render_field(form.date) }}
+                    {{ render_field(form.location) }}
+                    {{ render_field(form.student_id) }}
+                    
+                    <h5 class="mt-4">Observações e intervenções realizadas com os aluno(a)</h5>
+                    {{ render_field(form.initial_conditions) }}
+                    {{ render_field(form.difficulties_found) }}
+                    {{ render_field(form.observed_abilities) }}
+                    {{ render_field(form.activities_performed) }}
+                    {{ render_field(form.evolutions_observed) }}
+
+                    <h5 class="mt-4">Observações e intervenções realizadas com os docentes</h5>
+                    {{ render_field(form.adapted_assessments) }}
+                    {{ render_field(form.professional_impediments) }}
+                    {{ render_field(form.solutions) }}
+                    {{ render_field(form.additional_information) }}
+
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg w-100" id="submit-button">
+                            <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                            Salvar Relatório
+                        </button>
+                        <a href="{{ url_for('main.list_general_reports') }}" class="btn btn-secondary w-100">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.getElementById('add-general-report-form').addEventListener('submit', function() {
+        const submitButton = document.getElementById('submit-button');
+        const spinner = submitButton.querySelector('.spinner-border');
+
+        submitButton.disabled = true;
+        spinner.classList.remove('d-none');
+        submitButton.querySelector('span:not(.spinner-border)').textContent = 'Salvando...';
+    });
+</script>
+{% endblock %}

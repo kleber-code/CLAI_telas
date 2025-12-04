@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% from 'macros/form_macros.html' import render_field %}
+
+{% block title %}Novo Relatório Diário{% endblock %}
+
+{% block page_heading %}Novo Relatório Diário{% endblock %}
+
+{% block content %}
+<div class="row my-4">
+    <div class="col-md-8 mx-auto">
+        <div class="card shadow animate__animated animate__fadeInUp">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Diário de Atividades Diárias do Aluno</h5>
+            </div>
+            <div class="card-body">
+                <p>Apresente as informações nos campos abaixo.</p>
+                <form method="POST" id="add-daily-report-form">
+                    {{ form.hidden_tag() }}
+                    
+                    {{ render_field(form.date) }}
+                    {{ render_field(form.student_id) }}
+                    {{ render_field(form.professional_role) }}
+                    {{ render_field(form.shift) }}
+                    {{ render_field(form.activity_type) }}
+                    {{ render_field(form.difficulties) }}
+                    {{ render_field(form.actions_taken) }}
+                    {{ render_field(form.participants) }}
+                    {{ render_field(form.observations) }}
+
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg w-100" id="submit-button">
+                            <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                            Salvar Relatório
+                        </button>
+                        <a href="{{ url_for('main.list_daily_reports') }}" class="btn btn-secondary w-100">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.getElementById('add-daily-report-form').addEventListener('submit', function() {
+        const submitButton = document.getElementById('submit-button');
+        const spinner = submitButton.querySelector('.spinner-border');
+
+        submitButton.disabled = true;
+        spinner.classList.remove('d-none');
+        submitButton.querySelector('span:not(.spinner-border)').textContent = 'Salvando...';
+    });
+</script>
+{% endblock %}

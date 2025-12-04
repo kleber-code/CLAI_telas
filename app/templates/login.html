@@ -9,7 +9,7 @@
 <div class="container my-5">
     <div class="row justify-content-center">
         <div class="col-md-6 col-lg-5">
-            <div class="card shadow-lg border-0 rounded-3 mt-5">
+            <div class="card shadow-lg border-0 rounded-3 mt-5 animate__animated animate__fadeInUp">
                 <div class="card-header text-center py-4">
                     <img src="{{ url_for('static', filename='img/logo-clai.jpeg') }}" alt="Logo CLAI" class="img-fluid" style="max-width: 120px;">
                     <h3 class="fw-light my-4 text-primary">Acesse o Sistema CLAI</h3>
@@ -24,7 +24,7 @@
                             {% endfor %}
                         {% endif %}
                     {% endwith %}
-                    <form method="POST">
+                    <form method="POST" id="login-form">
                         {{ form.hidden_tag() }}
                         {{ render_field(form.login_id) }}
                         {{ render_field(form.password) }}
@@ -33,7 +33,10 @@
                             {{ form.remember.label(class="form-check-label") }}
                         </div>
                         <div class="d-grid gap-2">
-                            {{ render_submit_field(form.submit) }}
+                            <button type="submit" class="btn btn-primary btn-lg" id="login-button">
+                                <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                                Entrar
+                            </button>
                             <a href="#" class="btn btn-link text-decoration-none text-muted">Esqueceu sua senha?</a>
                         </div>
                     </form>
@@ -45,4 +48,23 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.getElementById('login-form').addEventListener('submit', function() {
+        const loginButton = document.getElementById('login-button');
+        const spinner = loginButton.querySelector('.spinner-border');
+
+        // Desabilita o botão e mostra o spinner
+        loginButton.disabled = true;
+        spinner.classList.remove('d-none');
+        loginButton.querySelector('span:not(.spinner-border)').textContent = 'Acessando...';
+
+        // Fake delay para o efeito ser visível
+        setTimeout(() => {
+            // O formulário continuará o submit normalmente após o delay
+        }, 500);
+    });
+</script>
 {% endblock %}

@@ -69,7 +69,14 @@
                             {{ render_field(form.responsible_phone) }}
                         </div>
                     </div>
-                    {{ render_field(form.responsible_email) }}
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ render_field(form.responsible_email) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ render_field(form.responsible_cpf, id="responsible_cpf") }}
+                        </div>
+                    </div>
                     {{ render_field(form.picture) }}
                     <div class="d-grid gap-2">
                         {{ render_submit_field(form.submit, extra_classes="w-100 btn-warning") }}
@@ -80,4 +87,12 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        setupCPFInput('responsible_cpf');
+    });
+</script>
 {% endblock %}

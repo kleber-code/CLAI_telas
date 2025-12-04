@@ -26,7 +26,13 @@
                                 <p class="mb-1"><strong>E-mail:</strong> {{ student.email if student.email else 'N/A' }}</p>
                             </div>
                             <div class="col-md-6">
-                                <p class="mb-1"><strong>Telefone:</strong> {{ student.phone if student.phone else 'N/A' }}</p>
+                                <p class="mb-1"><strong>Telefone:</strong> {{ student.phone if student.phone else 'N/A' }}
+                                    {% if student.phone %}
+                                        <a href="https://wa.me/{{ student.phone | replace(' ', '') | replace('-', '') | replace('(', '') | replace(')', '') }}" target="_blank" class="btn btn-sm btn-outline-success ms-2" title="Enviar mensagem via WhatsApp">
+                                            <i class="fab fa-whatsapp"></i>
+                                        </a>
+                                    {% endif %}
+                                </p>
                                 <p class="mb-1"><strong>Turma:</strong> {{ student.grade if student.grade else 'N/A' }}</p>
                                 <p class="mb-1"><strong>Curso:</strong> {{ student.course if student.course else 'N/A' }}</p>
                             </div>
@@ -41,17 +47,24 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <p class="mb-1"><strong>Nome:</strong> {{ student.responsible_name if student.responsible_name else 'N/A' }}</p>
-                                <p class="mb-1"><strong>Telefone:</strong> {{ student.responsible_phone if student.responsible_phone else 'N/A' }}</p>
+                                <p class="mb-1"><strong>Telefone:</strong> {{ student.responsible_phone if student.responsible_phone else 'N/A' }}
+                                    {% if student.responsible_phone %}
+                                        <a href="https://wa.me/{{ student.responsible_phone | replace(' ', '') | replace('-', '') | replace('(', '') | replace(')', '') }}" target="_blank" class="btn btn-sm btn-outline-success ms-2" title="Enviar mensagem via WhatsApp">
+                                            <i class="fab fa-whatsapp"></i>
+                                        </a>
+                                    {% endif %}
+                                </p>
                             </div>
                             <div class="col-md-6">
                                 <p class="mb-1"><strong>E-mail:</strong> {{ student.responsible_email if student.responsible_email else 'N/A' }}</p>
+                                <p class="mb-1"><strong>CPF:</strong> {{ student.responsible_cpf | format_cpf if student.responsible_cpf else 'N/A' }}</p>
                             </div>
                         </div>
 
                         <div class="mt-4 d-flex justify-content-end gap-2">
-                            <a href="{{ url_for('main.edit_student', student_id=student.id) }}" class="btn btn-warning" title="Editar informações do aluno"><i class="bi bi-pencil-square me-2"></i>Editar Aluno</a>
-                            <a href="{{ url_for('main.add_observation', student_id=student.id) }}" class="btn btn-success" title="Adicionar nova observação"><i class="bi bi-plus-circle me-2"></i>Adicionar Observação</a>
-                            <a href="{{ url_for('main.list_students') }}" class="btn btn-secondary" title="Voltar para a lista de alunos"><i class="bi bi-arrow-left me-2"></i>Voltar</a>
+                            <a href="{{ url_for('main.edit_student', student_id=student.id) }}" class="btn btn-warning">Editar Aluno</a>
+                            <a href="{{ url_for('main.add_observation', student_id=student.id) }}" class="btn btn-success">Adicionar Observação</a>
+                            <a href="{{ url_for('main.list_students') }}" class="btn btn-secondary">Voltar</a>
                         </div>
                     </div>
                 </div>
@@ -60,7 +73,7 @@
 
         <div class="card shadow mt-4">
             <div class="card-header bg-primary text-white">
-                <h5 class="mb-0"><i class="bi bi-journal-text me-2"></i>Histórico de Observações</h5>
+                <h5 class="mb-0">Histórico de Observações</h5>
             </div>
             <div class="card-body">
                 {% if observations %}
@@ -76,7 +89,7 @@
                                     <small class="text-muted">Justificativa (Edição): {{ obs.justification }}</small>
                                 {% endif %}
                                 <div class="mt-2 text-end">
-                                    <a href="{{ url_for('main.edit_observation', student_id=student.id, observation_id=obs.id) }}" class="btn btn-sm btn-info" title="Editar esta observação"><i class="bi bi-pencil me-2"></i>Editar</a>
+                                    <a href="{{ url_for('main.edit_observation', student_id=student.id, observation_id=obs.id) }}" class="btn btn-sm btn-warning">Editar</a>
                                 </div>
                             </li>
                         {% endfor %}
@@ -89,7 +102,7 @@
 
         <div class="card shadow mt-4">
             <div class="card-header bg-success text-white">
-                <h5 class="mb-0"><i class="bi bi-calendar-check me-2"></i>Histórico de Frequência</h5>
+                <h5 class="mb-0">Histórico de Frequência</h5>
             </div>
             <div class="card-body">
                 {% if attendance_records %}
@@ -116,13 +129,9 @@
                                         {% endif %}
                                     </td>
                                     <td>
-                                        <a href="{{ url_for('main.edit_attendance', attendance_id=record.id) }}" class="btn btn-sm btn-outline-primary me-1" title="Editar registro de frequência">
-                                            <i class="bi bi-pencil-square"></i>
-                                        </a>
+                                        <a href="{{ url_for('main.edit_attendance', attendance_id=record.id) }}" class="btn btn-sm btn-warning">Editar</a>
                                         <form action="{{ url_for('main.delete_attendance', attendance_id=record.id) }}" method="POST" style="display:inline;">
-                                            <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Tem certeza que deseja excluir este registro de frequência?');" title="Excluir registro de frequência">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
+                                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Tem certeza que deseja excluir este registro de frequência?');">Excluir</button>
                                         </form>
                                     </td>
                                 </tr>

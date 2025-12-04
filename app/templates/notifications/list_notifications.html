@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% from "macros/pagination_macros.html" import render_pagination %}
+
+{% block title %}Minhas Notificações - CLAI{% endblock %}
+
+{% block page_heading %}Minhas Notificações{% endblock %}
+
+{% block content %}
+<div class="row my-4">
+    <div class="col-lg-10 mx-auto">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0 text-primary">Notificações Recentes</h5>
+            {% if notifications and notifications.count() > 0 %}
+            <form action="{{ url_for('main.mark_all_notifications_read') }}" method="POST">
+                <button type="submit" class="btn btn-sm btn-outline-secondary">Marcar Todas como Lidas</button>
+            </form>
+            {% endif %}
+        </div>
+
+        {% if notifications and notifications.count() > 0 %}
+            <div class="list-group">
+                {% for notification in notifications %}
+                <div class="list-group-item list-group-item-action flex-column align-items-start {% if not notification.is_read %}list-group-item-light border-start border-primary border-4{% endif %} mb-2 rounded shadow-sm">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h6 class="mb-1 {% if not notification.is_read %}text-primary fw-bold{% else %}text-muted{% endif %}">
+                            <i class="bi bi-bell-fill me-2 {% if not notification.is_read %}text-primary{% else %}text-secondary{% endif %}"></i>
+                            {{ notification.message }}
+                        </h6>
+                        <small class="text-muted">{{ notification.timestamp.strftime('%d/%m/%Y %H:%M') }}</small>
+                    </div>
+                    {% if notification.link %}
+                    <p class="mb-1 mt-2">
+                        <a href="{{ notification.link }}" class="btn btn-sm btn-outline-info">Ver Detalhes</a>
+                    </p>
+                    {% endif %}
+                    {% if not notification.is_read %}
+                    <form action="{{ url_for('main.mark_notification_read', notification_id=notification.id) }}" method="POST" class="mt-2">
+                        <button type="submit" class="btn btn-sm btn-outline-success">Marcar como Lida</button>
+                    </form>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% block pagination %}
+            {% if paginator %}
+                {{ render_pagination(paginator) }}
+            {% endif %}
+            {% endblock %}
+        {% else %}
+            <div class="alert alert-info text-center" role="alert">
+                <i class="bi bi-info-circle me-2"></i>Você não tem notificações no momento.
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

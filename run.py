@@ -1,4 +1,3 @@
-# run.py
 from app import create_app, bcrypt
 from app.models import create_tables, User
 import os
@@ -13,7 +12,6 @@ def init_db_command():
     create_tables()
     print("Database tables created.")
 
-    # Create a default admin user if not exists
     with app.app_context():
         if not User.select().where(User.email == 'admin@clai.com').exists():
             hashed_password = bcrypt.generate_password_hash('admin').decode('utf-8')
@@ -31,5 +29,5 @@ def init_db_command():
 
 if __name__ == '__main__':
     create_tables()
-    app.run(debug=True)
+    app.run(debug=True, host="0.0.0.0", port=5000)
 

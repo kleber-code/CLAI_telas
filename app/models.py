@@ -1,10 +1,8 @@
-# app/models.py
-from peewee import Model, CharField, DateField, ForeignKeyField, TextField, DateTimeField, SqliteDatabase
+from peewee import Model, CharField, DateField, ForeignKeyField, TextField, DateTimeField, SqliteDatabase, BooleanField
 from flask_login import UserMixin
 import datetime
 
 
-# Configure your database here. For development, SQLite is simple.
 db = SqliteDatabase('clai.db')
 
 class BaseModel(Model):
@@ -23,15 +21,12 @@ class User(UserMixin, BaseModel):
         return str(self.id)
 
     class Meta:
-        # Define table name explicitly
         table_name = 'users'
 
 class Student(BaseModel):
     name = CharField()
     matricula = CharField(unique=True)
     dob = DateField()  # Date of Birth
-    # WARNING: This field may contain sensitive medical information (International Classification of Diseases - CID).
-    # Consider encryption at rest, stricter access controls, or re-evaluating its necessity.
     cid = CharField(null=True)  # International Classification of Diseases
     email = CharField(null=True)
     phone = CharField(null=True)
@@ -40,6 +35,7 @@ class Student(BaseModel):
     responsible_name = CharField(null=True)
     responsible_phone = CharField(null=True)
     responsible_email = CharField(null=True)
+    responsible_cpf = CharField(null=True) # Responsible CPF field added
     pedagogue = ForeignKeyField(User, backref='students', null=True)  # Assign a primary pedagogue
     student_picture = CharField(default='default_student.png')
     specific_needs_description = TextField(null=True)  # New field for RF05
@@ -76,23 +72,51 @@ class Event(BaseModel):
     class Meta:
         table_name = 'events'
 
-class DailyLog(BaseModel):
-    student = ForeignKeyField(Student, backref='daily_logs')
-    pedagogue = ForeignKeyField(User, backref='daily_logs')
+class DailyReport(BaseModel):
+    student = ForeignKeyField(Student, backref='daily_reports')
+    pedagogue = ForeignKeyField(User, backref='daily_reports')
     date = DateField(default=datetime.date.today)
-    shift = CharField()  # Manhã, Tarde, Integral, Noite
+    shift = CharField()
     activity_type = CharField()
     difficulties = TextField(null=True)
     actions_taken = TextField(null=True)
     participants = TextField(null=True)
+    observations = TextField(null=True)
+    professional_role = CharField(null=True)
 
     class Meta:
-        table_name = 'daily_logs'
+        table_name = 'daily_reports'
 
-# Function to create tables
+class GeneralReport(BaseModel):
+    student = ForeignKeyField(Student, backref='general_reports')
+    pedagogue = ForeignKeyField(User, backref='general_reports')
+    date = DateField(default=datetime.date.today)
+    location = CharField(null=True)
+    initial_conditions = TextField(null=True)
+    difficulties_found = TextField(null=True)
+    observed_abilities = TextField(null=True)
+    activities_performed = TextField(null=True)
+    evolutions_observed = TextField(null=True)
+    adapted_assessments = BooleanField(null=True)
+    professional_impediments = TextField(null=True)
+    solutions = TextField(null=True)
+    additional_information = TextField(null=True)
+
+    class Meta:
+        table_name = 'general_reports'
+
+class Notification(BaseModel):
+    recipient = ForeignKeyField(User, backref='notifications')
+    message = TextField()
+    link = CharField(null=True) # Optional URL for the notification
+    is_read = BooleanField(default=False)
+    timestamp = DateTimeField(default=datetime.datetime.now)
+
+    class Meta:
+        table_name = 'notifications'
+
+
 def create_tables():
     with db:
-        db.create_tables([User, Student, Observation, Attendance, Event, DailyLog])
+        db.create_tables([User, Student, Observation, Attendance, Event, DailyReport, GeneralReport, Notification])
 
-# It's a good practice to connect and close the database explicitly
-# or use a request handler in Flask.

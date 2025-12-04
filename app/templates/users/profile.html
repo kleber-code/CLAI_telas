@@ -34,6 +34,7 @@
                     {{ render_field(form.picture) }}
                     <div class="d-grid gap-2 mt-4">
                         {{ render_submit_field(form.submit, extra_classes="w-100") }}
+                        <a href="{{ url_for('main.change_password') }}" class="btn btn-secondary w-100 mt-2">Alterar Senha</a>
                     </div>
                 </form>
             </div>

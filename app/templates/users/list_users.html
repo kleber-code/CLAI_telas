@@ -7,7 +7,7 @@
 <div class="row my-4">
     <div class="col-md-12">
         <div class="d-flex justify-content-end mb-3">
-            <a href="{{ url_for('main.add_user') }}" class="btn btn-primary"><i class="bi bi-plus-circle me-1"></i> Adicionar Novo Usuário</a>
+            <a href="{{ url_for('main.add_user') }}" class="btn btn-primary">Adicionar Novo Usuário</a>
         </div>
 
         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -30,7 +30,7 @@
                         <thead>
                             <tr>
                                 <th scope="col">Nome</th>
-                                <th scope="col">Usuário</th>
+                                <th scope="col">CPF</th>
                                 <th scope="col">Email</th>
                                 <th scope="col">Função</th>
                                 <th scope="col">Ações</th>
@@ -40,13 +40,17 @@
                             {% for user in users %}
                             <tr>
                                 <td>{{ user.name }}</td>
-                                <td>{{ user.username }}</td>
+                                <td>{{ user.username | format_cpf }}</td>
                                 <td>{{ user.email }}</td>
-                                <td>{{ user.role }}</td>
                                 <td>
-                                    <a href="{{ url_for('main.edit_user', user_id=user.id) }}" class="btn btn-warning btn-sm" title="Editar Usuário">Editar</a>
+                                    <span class="badge bg-{{ 'primary' if user.role == 'admin' else 'secondary' }}">
+                                        {{ role_map.get(user.role, user.role) }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('main.edit_user', user_id=user.id) }}" class="btn btn-warning btn-sm">Editar</a>
                                     <form action="{{ url_for('main.delete_user', user_id=user.id) }}" method="POST" style="display:inline;">
-                                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Tem certeza que deseja excluir este usuário?')" title="Excluir Usuário">Excluir</button>
+                                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Tem certeza que deseja excluir este usuário?')">Excluir</button>
                                     </form>
                                 </td>
                             </tr>

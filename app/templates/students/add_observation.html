@@ -7,7 +7,7 @@
 {% block content %}
 <div class="row my-4">
     <div class="col-md-8 mx-auto">
-        <div class="card shadow">
+        <div class="card shadow animate__animated animate__fadeInUp">
             <div class="card-header bg-primary text-white">
                 <h5 class="mb-0">Adicionar Observação para {{ student.name }}</h5>
             </div>
@@ -22,12 +22,15 @@
                     {% endif %}
                 {% endwith %}
 
-                <form method="POST">
+                <form method="POST" id="add-observation-form">
                     {{ form.hidden_tag() }}
                     {{ render_field(form.observation_text) }}
                     {{ render_field(form.justification) }}
-                    <div class="d-grid gap-2">
-                        {{ render_submit_field(form.submit, extra_classes="w-100 btn-success") }}
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg w-100" id="submit-button">
+                            <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                            Salvar Observação
+                        </button>
                         <a href="{{ url_for('main.student_detail', student_id=student.id) }}" class="btn btn-secondary w-100">Cancelar</a>
                     </div>
                 </form>
@@ -35,4 +38,17 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.getElementById('add-observation-form').addEventListener('submit', function() {
+        const submitButton = document.getElementById('submit-button');
+        const spinner = submitButton.querySelector('.spinner-border');
+
+        submitButton.disabled = true;
+        spinner.classList.remove('d-none');
+        submitButton.querySelector('span:not(.spinner-border)').textContent = 'Salvando...';
+    });
+</script>
 {% endblock %}

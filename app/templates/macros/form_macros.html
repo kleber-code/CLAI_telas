@@ -1,23 +1,30 @@
-{% macro render_field(field) %}
+{% macro render_field(field, id=None) %}
     <div class="form-group mb-3">
         {% if field.type == 'BooleanField' %}
             <div class="form-check">
-                {{ field(class="form-check-input") }}
+                {{ field(class="form-check-input", id=id) }}
                 {{ field.label(class="form-check-label") }}
             </div>
         {% elif field.type == 'FileField' %}
             {{ field.label(class="form-label") }}
-            {{ field(class="form-control") }}
+            {{ field(class="form-control", id=id) }}
         {% elif field.type == 'SelectMultipleField' %}
             {{ field.label(class="form-label") }}
-            <select class="form-select" id="{{ field.id }}" name="{{ field.name }}" multiple>
-                {% for value, label, selected in field.iter_choices() %}
-                    <option value="{{ value }}" {% if selected %}selected{% endif %}>{{ label }}</option>
+            <select class="form-select" id="{{ id if id is not none else field.id }}" name="{{ field.name }}" multiple>
+                {% for subfield in field %}
+                    <option value="{{ subfield.data }}" {% if subfield.checked %}selected{% endif %}>{{ subfield.label.text }}</option>
+                {% endfor %}
+            </select>
+        {% elif field.type == 'SelectField' %}
+            {{ field.label(class="form-label") }}
+            <select class="form-select" id="{{ id if id is not none else field.id }}" name="{{ field.name }}">
+                {% for value, label in field.choices %}
+                    <option value="{{ value }}" {% if value == field.data %}selected{% endif %}>{{ label }}</option>
                 {% endfor %}
             </select>
         {% else %}
             {{ field.label(class="form-label") }}
-            {{ field(class="form-control" + (' is-invalid' if field.errors else ''), placeholder=field.render_kw.get('placeholder') if field.render_kw and field.render_kw.get('placeholder') else '') }}
+            {{ field(class="form-control" + (' is-invalid' if field.errors else ''), placeholder=field.render_kw.get('placeholder') if field.render_kw and field.render_kw.get('placeholder') else '', id=id) }}
         {% endif %}
 
         {% if field.errors %}

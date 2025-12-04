@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}Relatórios Gerais - CLAI{% endblock %}
+
+{% block page_heading %}Relatórios Gerais{% endblock %}
+
+{% block content %}
+<div class="row my-4">
+    <div class="col-md-12">
+        <div class="d-flex justify-content-end mb-3">
+            <a href="{{ url_for('main.add_general_report') }}" class="btn btn-primary">Novo Relatório Geral</a>
+        </div>
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <form method="GET" action="{{ url_for('main.list_general_reports') }}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-5">
+                            <label for="student_id" class="form-label">Aluno</label>
+                            <select name="student_id" id="student_id" class="form-select">
+                                <option value="">Todos os Alunos</option>
+                                {% for student in students %}
+                                    <option value="{{ student.id }}" {% if student.id == selected_student_id %}selected{% endif %}>{{ student.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="date" class="form-label">Data</label>
+                            <input type="date" name="date" id="date" class="form-control" value="{{ selected_date or '' }}">
+                        </div>
+                        <div class="col-md-4 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary me-2">Filtrar</button>
+                            <a href="{{ url_for('main.list_general_reports') }}" class="btn btn-secondary">Limpar</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="card shadow mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Relatórios Gerais</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th scope="col">Data</th>
+                                <th scope="col">Aluno</th>
+                                <th scope="col">Pedagoga</th>
+                                <th scope="col">Local</th>
+                                <th scope="col">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for report in reports %}
+                            <tr>
+                                <td>{{ report.date.strftime('%d/%m/%Y') }}</td>
+                                <td>{{ report.student.name }}</td>
+                                <td>{{ report.pedagogue.name }}</td>
+                                <td>{{ report.location }}</td>
+                                <td>
+                                    <a href="{{ url_for('main.view_general_report', report_id=report.id) }}" class="btn btn-info btn-sm">Detalhes</a>
+                                    {% if report.pedagogue == current_user or current_user.role == 'admin' %}
+                                        <a href="{{ url_for('main.edit_general_report', report_id=report.id) }}" class="btn btn-warning btn-sm">Editar</a>
+                                        <form action="{{ url_for('main.delete_general_report', report_id=report.id) }}" method="POST" style="display:inline;">
+                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Tem certeza que deseja excluir este relatório?');">Excluir</button>
+                                        </form>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5">Nenhum relatório geral encontrado.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

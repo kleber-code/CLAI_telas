@@ -1,4 +1,3 @@
-# config.py
 import os
 from dotenv import load_dotenv
 
@@ -7,7 +6,7 @@ load_dotenv()
 
 
 class Config:
-    SECRET_KEY = os.environ.get('SECRET_KEY')  # Must be set in production, e.g., export SECRET_KEY='your_random_secret_key'
+    SECRET_KEY='SENHA_DO_APP'
     DATABASE = os.path.join(os.getcwd(), 'clai.db')
     APP_BASE_NAME = "CLAI"
     APP_SUFFIX = "App"

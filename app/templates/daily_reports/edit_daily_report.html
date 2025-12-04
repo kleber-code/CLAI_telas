@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% from 'macros/form_macros.html' import render_field %}
+
+{% block title %}Editar Relatório Diário{% endblock %}
+
+{% block page_heading %}Editar Relatório Diário{% endblock %}
+
+{% block content %}
+<div class="row my-4">
+    <div class="col-md-8 mx-auto">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Editando Relatório de {{ report.student.name }} - {{ report.date.strftime('%d/%m/%Y') }}</h5>
+            </div>
+            <div class="card-body">
+                <p>Apresente as informações nos campos abaixo.</p>
+                <form method="POST" action="{{ url_for('main.edit_daily_report', report_id=report.id) }}">
+                    {{ form.hidden_tag() }}
+
+                    {{ render_field(form.date) }}
+                    {{ render_field(form.student_id) }}
+                    {{ render_field(form.professional_role) }}
+                    {{ render_field(form.shift) }}
+                    {{ render_field(form.activity_type) }}
+                    {{ render_field(form.difficulties) }}
+                    {{ render_field(form.actions_taken) }}
+                    {{ render_field(form.participants) }}
+                    {{ render_field(form.observations) }}
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{{ url_for('main.view_daily_report', report_id=report.id) }}" class="btn btn-secondary">Cancelar</a>
+                        {{ form.submit(class="btn btn-primary", value="Salvar Alterações") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
