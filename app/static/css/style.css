@@ -22,7 +22,7 @@
 /* --- LIGHT THEME (Padrão) --- */
 html[data-bs-theme="light"] {
     /* Cores Principais Customizadas */
-    --bs-primary: #346294; /* Azul Profissional - Principal para botões, links, etc. */
+    --bs-primary: #0d6efd; /* Azul Default do Bootstrap */
     --bs-secondary: #3b4a59; /* Azul Cinzento - Para elementos secundários, como textos muted, etc. */
 
     /* Redefinindo semantic colors to adhere to 2-3 color rule (using shades of primary/neutral) */
@@ -41,7 +41,7 @@ html[data-bs-theme="light"] {
     
     --bs-dark: #2d3748;    /* Tom mais escuro de azul acinzentado */
     /* Para cálculo de RGBA */
-    --bs-primary-rgb: 52, 98, 148;
+    --bs-primary-rgb: 13, 110, 253;
     --bs-secondary-rgb: 59, 74, 89;
 
     /* RGB for the remapped semantic colors */
@@ -397,6 +397,51 @@ body {
     color: var(--bs-warning-text-emphasis) !important;
 }
 
+/* Custom Button Styles to adhere to 2-3 color scheme */
+.btn-success {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+    color: var(--bs-light);
+}
+
+.btn-success:hover {
+    background-color: var(--bs-secondary);
+    border-color: var(--bs-secondary);
+}
+
+.btn-info {
+    background-color: var(--bs-secondary);
+    border-color: var(--bs-secondary);
+    color: var(--bs-light);
+}
+
+.btn-info:hover {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+}
+
+.btn-warning {
+    background-color: var(--bs-secondary); /* Use secondary color for warning button */
+    border-color: var(--bs-secondary);
+    color: var(--bs-light);
+}
+
+.btn-warning:hover {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+}
+
+.btn-danger {
+    background-color: #8B0000; /* Dark red for critical actions */
+    border-color: #8B0000;
+    color: var(--bs-light);
+}
+
+.btn-danger:hover {
+    background-color: #A30000; /* Slightly lighter red on hover */
+    border-color: #A30000;
+}
+
 /* --- THEMES PERSONALIZADOS --- */
 
 /* High-Contrast Theme */
@@ -480,8 +525,9 @@ html[data-bs-theme="high-contrast"] {
     }
 
     .form-control, .form-select {
-        background-color: var(--bs-body-bg); /* Black background */
-        color: var(--bs-body-color); /* White text */
+        background-color: #ffffff !important; /* White background */
+        color: #000000 !important; /* Black text */
+        font-weight: bold !important; /* Bold text */
         border: 1px solid var(--bs-border-color); /* White border */
     }
     .form-control:focus, .form-select:focus {
@@ -530,7 +576,7 @@ html[data-bs-theme="deuteranomaly"] {
     --bs-success-text-emphasis: #155724;
 
     --bs-danger-bg-subtle: #f8d7da;
-    --bs-danger-border-subtle: #f5c6cb;
+    --bs-danger-border-subtle: #f5c2c7;
     --bs-danger-text-emphasis: #721c24;
 
     --bs-warning-bg-subtle: #fff3cd;
@@ -540,4 +586,89 @@ html[data-bs-theme="deuteranomaly"] {
     --bs-info-bg-subtle: #d1ecf1;
     --bs-info-border-subtle: #bee5eb;
     --bs-info-text-emphasis: #0c5460;
+}
+
+/* Accessible Reading Mode */
+html[data-bs-theme="accessible-reading"] {
+    --bs-primary: #000000; /* Black for primary accents */
+    --bs-secondary: #333333; /* Dark gray for secondary accents */
+
+    --bs-body-bg: #f8f8f8; /* Very light gray background */
+    --bs-body-color: #000000; /* Pure black text */
+    --bs-secondary-color: #333333; /* Dark gray for secondary text/icons */
+    --bs-tertiary-bg: #e5e5e5; /* Slightly darker light gray for hover/cards */
+    --bs-border-color: #cccccc; /* Medium gray for borders */
+    
+    /* Semantic colors for alerts in accessible mode - simplified */
+    --bs-success-bg-subtle: #d4edda; /* Light green */
+    --bs-success-border-subtle: #c3e6cb;
+    --bs-success-text-emphasis: #155724;
+
+    --bs-danger-bg-subtle: #f8d7da; /* Light red */
+    --bs-danger-border-subtle: #f5c2c7;
+    --bs-danger-text-emphasis: #842029;
+
+    --bs-warning-bg-subtle: #fff3cd; /* Light yellow */
+    --bs-warning-border-subtle: #ffeeba;
+    --bs-warning-text-emphasis: #664d03;
+
+    --bs-info-bg-subtle: #cff4fc; /* Light blue */
+    --bs-info-border-subtle: #b6effb;
+    --bs-info-text-emphasis: #055160;
+}
+
+/* Specific adjustments for accessible reading mode */
+html[data-bs-theme="accessible-reading"] body {
+    font-size: 1.15rem; /* Larger base font size */
+    line-height: 1.8;   /* Increased line height for readability */
+}
+
+html[data-bs-theme="accessible-reading"] .h1,
+html[data-bs-theme="accessible-reading"] .h2,
+html[data-bs-theme="accessible-reading"] .h3,
+html[data-bs-theme="accessible-reading"] .h4,
+html[data-bs-theme="accessible-reading"] .h5,
+html[data-bs-theme="accessible-reading"] .h6,
+html[data-bs-theme="accessible-reading"] h1,
+html[data-bs-theme="accessible-reading"] h2,
+html[data-bs-theme="accessible-reading"] h3,
+html[data-bs-theme="accessible-reading"] h4,
+html[data-bs-theme="accessible-reading"] h5,
+html[data-bs-theme="accessible-reading"] h6 {
+    line-height: 1.4; /* Adjust heading line heights */
+}
+
+/* Ensure sufficient contrast for sidebar active items and buttons */
+html[data-bs-theme="accessible-reading"] .list-group-item.active {
+    background-color: var(--bs-primary) !important;
+    color: var(--bs-body-bg) !important; /* White text on black primary */
+}
+
+html[data-bs-theme="accessible-reading"] .btn-primary,
+html[data-bs-theme="accessible-reading"] .btn-success,
+html[data-bs-theme="accessible-reading"] .btn-info,
+html[data-bs-theme="accessible-reading"] .btn-warning {
+    background-color: var(--bs-primary) !important;
+    border-color: var(--bs-primary) !important;
+    color: var(--bs-body-bg) !important; /* White text on black buttons */
+}
+
+html[data-bs-theme="accessible-reading"] .btn-primary:hover,
+html[data-bs-theme="accessible-reading"] .btn-success:hover,
+html[data-bs-theme="accessible-reading"] .btn-info:hover,
+html[data-bs-theme="accessible-reading"] .btn-warning:hover {
+    background-color: var(--bs-secondary) !important;
+    border-color: var(--bs-secondary) !important;
+    color: var(--bs-body-bg) !important;
+}
+
+html[data-bs-theme="accessible-reading"] .btn-danger {
+    background-color: #CC0000 !important; /* Strong red for danger */
+    border-color: #CC0000 !important;
+    color: var(--bs-body-bg) !important;
+}
+
+html[data-bs-theme="accessible-reading"] .btn-danger:hover {
+    background-color: #990000 !important;
+    border-color: #990000 !important;
 }
