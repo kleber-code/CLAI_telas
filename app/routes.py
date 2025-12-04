@@ -165,11 +165,11 @@ def logout():
 def dashboard():
     today = datetime.date.today()
     if current_user.role == 'admin':
-        students = Student.select()
+        students = Student.select().limit(6)
         upcoming_events = Event.select().where(Event.start_time >= datetime.datetime.now())
         recent_observations = Observation.select().where(Observation.date >= today - datetime.timedelta(days=7))
     else:
-        students = Student.select().where(Student.pedagogue == current_user)
+        students = Student.select().where(Student.pedagogue == current_user).limit(6)
         upcoming_events = Event.select().where(
             (Event.pedagogue == current_user) and 
             (Event.start_time >= datetime.datetime.now())
