@@ -14,7 +14,8 @@
             <div class="card-body">
                 <form method="GET" action="{{ url_for('main.list_students') }}">
                     <div class="input-group">
-                        <input type="text" class="form-control" name="search" placeholder="Buscar por nome ou matrícula..." value="{{ search_query or '' }}">
+                        <input type="text" class="form-control" id="searchInput" name="search" placeholder="Buscar por nome ou matrícula..." value="{{ search_query or '' }}">
+                        <button class="btn btn-secondary" type="button" id="clearSearchButton">Limpar</button>
                         <button class="btn btn-primary" type="submit">
                             Buscar
                         </button>
@@ -76,4 +77,22 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
+        const clearSearchButton = document.getElementById('clearSearchButton');
+
+        if (clearSearchButton) {
+            clearSearchButton.addEventListener('click', function() {
+                searchInput.value = '';
+                // Navigate to the base URL to clear search params
+                window.location.href = window.location.pathname;
+            });
+        }
+    });
+</script>
 {% endblock %}

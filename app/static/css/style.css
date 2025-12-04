@@ -1,5 +1,26 @@
-/* --- VARIÁVEIS E FUNDAMENTOS --- */
+/* --- VARIÁVEIS E FUNDAMENTOS GLOBAIS --- */
 :root {
+    /* Tipografia */
+    --font-main: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    
+    /* Dimensões */
+    --sidebar-width: 280px;
+    --topbar-height: 72px;
+    --border-radius-lg: 0.75rem;
+    --border-radius-sm: 0.375rem;
+
+    /* Sombras Profissionais (Soft Shadows) */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    
+    /* Transições */
+    --transition-speed: 0.25s;
+    --transition-curve: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* --- LIGHT THEME (Padrão) --- */
+html[data-bs-theme="light"] {
     /* Cores Principais Customizadas */
     --bs-primary: #346294; /* Azul Profissional - Principal para botões, links, etc. */
     --bs-secondary: #3b4a59; /* Azul Cinzento - Para elementos secundários, como textos muted, etc. */
@@ -48,24 +69,53 @@
     --bs-info-bg-subtle: var(--bs-body-bg); /* Very light background for info */
     --bs-info-border-subtle: var(--bs-border-color);
     --bs-info-text-emphasis: var(--bs-secondary); /* Text is secondary blue-grey */
+}
 
-    /* Tipografia */
-    --font-main: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    
-    /* Dimensões */
-    --sidebar-width: 280px;
-    --topbar-height: 72px;
-    --border-radius-lg: 0.75rem;
-    --border-radius-sm: 0.375rem;
+/* --- DARK THEME --- */
+html[data-bs-theme="dark"] {
+    --bs-primary: #5d9cec; /* Light blue for primary in dark mode */
+    --bs-secondary: #a0aec0; /* Lighter grey for secondary */
 
-    /* Sombras Profissionais (Soft Shadows) */
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --bs-success: #66bb6a;
+    --bs-info: #42a5f5;
+    --bs-warning: #ffa726;
+    --bs-danger: #ef5350;
+
+    --bs-light: #4a5568;   /* Darker grey for 'light' in dark mode */
+    --bs-body-bg: #1a202c;      /* Very dark background */
+    --bs-body-color: #e2e8f0;   /* Light text */
+    --bs-secondary-color: #a0aec0; /* Medium grey for secondary text/icons */
+    --bs-tertiary-bg: #2d3748;  /* Darker grey for cards, hover */
+    --bs-border-color: #4a5568; /* Darker border color */
     
-    /* Transições */
-    --transition-speed: 0.25s;
-    --transition-curve: cubic-bezier(0.2, 0.8, 0.2, 1);
+    --bs-dark: #cbd5e0;    /* Lighter tone for 'dark' in dark mode */
+
+    --bs-primary-rgb: 93, 156, 236;
+    --bs-secondary-rgb: 160, 174, 192;
+    --bs-success-rgb: 102, 187, 106;
+    --bs-info-rgb: 66, 165, 245;
+    --bs-warning-rgb: 255, 167, 38;
+    --bs-danger-rgb: 239, 83, 80;
+
+    --bs-light-rgb: 74, 85, 104;
+    --bs-dark-rgb: 203, 213, 224;
+
+    /* Alert / Status Colors for Dark Theme */
+    --bs-success-bg-subtle: #1f3d20; /* Darker green background */
+    --bs-success-border-subtle: #4c6a4e;
+    --bs-success-text-emphasis: #c3e6cb;
+
+    --bs-danger-bg-subtle: #492828; /* Darker red background */
+    --bs-danger-border-subtle: #723e3e;
+    --bs-danger-text-emphasis: #f5c6cb;
+
+    --bs-warning-bg-subtle: #4a3e20; /* Darker orange background */
+    --bs-warning-border-subtle: #715b3a;
+    --bs-warning-text-emphasis: #ffeeba;
+    
+    --bs-info-bg-subtle: #203f4a; /* Darker info background */
+    --bs-info-border-subtle: #3a5d71;
+    --bs-info-text-emphasis: #bee5eb;
 }
 
 body {
@@ -351,19 +401,22 @@ body {
 
 /* High-Contrast Theme */
 html[data-bs-theme="high-contrast"] {
-    --bs-primary: #00ffff; /* Ciano Brilhante para destaque */
-    --bs-secondary: #ffffff; /* Branco Puro para texto */
-    --bs-body-bg: #000000;      /* Fundo Preto */
-    --bs-body-color: #ffffff;   /* Texto Branco */
-    --bs-secondary-color: #e0e0e0; /* Cinza Claro para texto secundário */
-    --bs-tertiary-bg: #333333;  /* Cinza Escuro para elementos */
-    --bs-border-color: #00ffff; /* Borda Ciano */
+    --bs-primary: #00ffff; /* Cyan for primary accents */
+    --bs-secondary: #ffffff; /* Pure white for secondary elements */
 
-    /* Redefinição de cores semânticas para alto contraste */
-    --bs-success: #00ff00;
-    --bs-info: #ffff00;
-    --bs-warning: #ff00ff;
-    --bs-danger: #ff0000;
+    --bs-success: #00ff00; /* Bright green */
+    --bs-info: #ffff00;    /* Bright yellow */
+    --bs-warning: #ff00ff; /* Magenta */
+    --bs-danger: #ff0000;  /* Pure red */
+
+    --bs-light: #333333;   /* Dark grey for elements often light */
+    --bs-body-bg: #000000;      /* Pure black background */
+    --bs-body-color: #ffffff;   /* Pure white text */
+    --bs-secondary-color: #e0e0e0; /* Light grey for secondary text */
+    --bs-tertiary-bg: #222222;  /* Very dark grey for cards, subtle backgrounds */
+    --bs-border-color: #00ffff; /* Cyan border */
+    
+    --bs-dark: #cccccc;    /* Light grey for elements often dark */
 
     --bs-primary-rgb: 0, 255, 255;
     --bs-secondary-rgb: 255, 255, 255;
@@ -372,8 +425,25 @@ html[data-bs-theme="high-contrast"] {
     --bs-warning-rgb: 255, 0, 255;
     --bs-danger-rgb: 255, 0, 0;
 
-    --bs-light: #333333; /* Usar um cinza escuro para 'light' em modo de alto contraste */
-    --bs-dark: #cccccc; /* Usar um cinza claro para 'dark' em modo de alto contraste */
+    --bs-light-rgb: 51, 51, 51;
+    --bs-dark-rgb: 204, 204, 204;
+
+    /* Alert / Status Colors for High Contrast Theme */
+    --bs-success-bg-subtle: #006600; /* Darker green background */
+    --bs-success-border-subtle: #00cc00;
+    --bs-success-text-emphasis: #00ff00;
+
+    --bs-danger-bg-subtle: #660000; /* Darker red background */
+    --bs-danger-border-subtle: #ff0000;
+    --bs-danger-text-emphasis: #ffaaaa;
+
+    --bs-warning-bg-subtle: #660066; /* Darker magenta background */
+    --bs-warning-border-subtle: #ff00ff;
+    --bs-warning-text-emphasis: #ffccff;
+    
+    --bs-info-bg-subtle: #006666; /* Darker cyan background */
+    --bs-info-border-subtle: #00ffff;
+    --bs-info-text-emphasis: #ccffff;
 
     /* Ajustes específicos para alto contraste em componentes */
     .list-group-item {
@@ -409,34 +479,51 @@ html[data-bs-theme="high-contrast"] {
     }
 }
 
-/* Deuteranomaly Theme (Basic adjustment - typically requires more nuanced color palette review) */
+/* Deuteranomaly Theme - Optimized for Red-Green Color Blindness */
 html[data-bs-theme="deuteranomaly"] {
-    /* Main color adjustments - focusing on distinguishing red/green */
-    --bs-primary: #007bff; /* Keep original blue for general primary */
-    --bs-success: #008000; /* Darker green, less red component */
-    --bs-danger: #e03232;  /* Slightly desaturated red */
-    --bs-warning: #ffa500; /* Orange instead of yellow to avoid confusion with green */
+    /* Adjusting primary colors to ensure better distinction */
+    --bs-primary: #337ab7; /* A clear blue, distinct from problematic reds/greens */
+    --bs-secondary: #6c757d; /* Standard secondary */
 
-    /* Example: increase luminance contrast for green/red areas */
-    /* This is highly dependent on specific design elements and might need more targeted rules */
-    .text-success { color: #008000 !important; }
-    .bg-success { background-color: #008000 !important; }
-    .text-danger { color: #e03232 !important; }
-    .bg-danger { background-color: #e03232 !important; }
-    .badge.bg-success { background-color: #008000 !important; }
-    .badge.bg-danger { background-color: #e03232 !important; }
+    /* Re-evaluating semantic colors for better distinction */
+    --bs-success: #3cb371; /* Medium Sea Green (more blue component than typical green) */
+    --bs-info: #17a2b8;    /* Keep original info blue */
+    --bs-warning: #ffb400; /* Orange-yellow, distinct from green */
+    --bs-danger: #cc3333;  /* A deeper, slightly desaturated red */
 
-    /* Ensure text colors maintain good contrast */
-    --bs-body-color: #212529; /* Default dark text */
-    --bs-body-bg: #f8f9fa; /* Default light background */
+    /* Backgrounds and text - aim for good contrast and readability */
+    --bs-light: #f8f9fa;
+    --bs-body-bg: #f8f9fa;
+    --bs-body-color: #212529;
+    --bs-secondary-color: #6c757d;
+    --bs-tertiary-bg: #e9ecef;
+    --bs-border-color: #dee2e6;
+    --bs-dark: #343a40;
 
-    /* If in dark mode, adjust accordingly */
-    &[data-bs-theme="dark"] {
-        --bs-body-color: #f8f9fa;
-        --bs-body-bg: #212529;
-        --bs-success: #28a745; /* Original green for dark mode */
-        --bs-danger: #dc3545;  /* Original red for dark mode */
-        --bs-warning: #ffc107; /* Original yellow for dark mode */
-        /* For dark mode, the strategy might be different. This example keeps it simple */
-    }
+    --bs-primary-rgb: 51, 122, 183;
+    --bs-secondary-rgb: 108, 117, 125;
+    --bs-success-rgb: 60, 179, 113;
+    --bs-info-rgb: 23, 162, 184;
+    --bs-warning-rgb: 255, 180, 0;
+    --bs-danger-rgb: 204, 51, 51;
+
+    --bs-light-rgb: 248, 249, 250;
+    --bs-dark-rgb: 52, 58, 64;
+
+    /* Alert / Status Colors for Deuteranomaly Theme */
+    --bs-success-bg-subtle: #d4edda;
+    --bs-success-border-subtle: #c3e6cb;
+    --bs-success-text-emphasis: #155724;
+
+    --bs-danger-bg-subtle: #f8d7da;
+    --bs-danger-border-subtle: #f5c6cb;
+    --bs-danger-text-emphasis: #721c24;
+
+    --bs-warning-bg-subtle: #fff3cd;
+    --bs-warning-border-subtle: #ffeeba;
+    --bs-warning-text-emphasis: #856404;
+    
+    --bs-info-bg-subtle: #d1ecf1;
+    --bs-info-border-subtle: #bee5eb;
+    --bs-info-text-emphasis: #0c5460;
 }
