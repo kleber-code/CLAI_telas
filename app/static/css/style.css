@@ -5,30 +5,29 @@
     --bs-secondary: #3b4a59; /* Azul Cinzento - Para elementos secundários, como textos muted, etc. */
 
     /* Redefinindo semantic colors to adhere to 2-3 color rule (using shades of primary/neutral) */
-    --bs-success: var(--bs-primary); /* Success now uses primary color */
-    --bs-info: var(--bs-secondary); /* Info now uses secondary color */
-    --bs-warning: var(--bs-secondary); /* Warning now uses secondary color */
-    --bs-danger: #8B0000; /* Dark Red for critical danger, as an exception for safety/criticality */
+    --bs-success: #28a745;
+    --bs-info: #17a2b8;
+    --bs-warning: #ffc107;
+    --bs-danger: #dc3545;
 
     --bs-light: #f8f9fa;   /* Muito claro, quase branco */
-    --bs-dark: #343a40;    /* Escuro, para texto em fundos claros */
-
-    /* Neutros / Tons de Cinza Customizados para a UI geral */
-    --bs-body-bg: #f5f7fa;      /* Fundo principal da página */
-    --bs-body-color: #495057;   /* Cor do texto principal */
-    --bs-secondary-color: #6c757d; /* Cor do texto secundário/ícones */
-    --bs-tertiary-bg: #e9ecef;  /* Fundo para hover, tabelas, cards */
-    --bs-border-color: #dee2e6; /* Cor da borda */
+    /* Neutros / Tons Azuis Acinzentados Customizados para a UI geral */
+    --bs-body-bg: #eef2f6;      /* Fundo principal da página (azul claro sutil) */
+    --bs-body-color: #4a5568;   /* Cor do texto principal (azul acinzentado escuro) */
+    --bs-secondary-color: #718096; /* Cor do texto secundário/ícones (azul acinzentado médio) */
+    --bs-tertiary-bg: #e2e8f0;  /* Fundo para hover, tabelas, cards (azul acinzentado claro) */
+    --bs-border-color: #cbd5e0; /* Cor da borda (azul acinzentado muito claro) */
     
+    --bs-dark: #2d3748;    /* Tom mais escuro de azul acinzentado */
     /* Para cálculo de RGBA */
     --bs-primary-rgb: 52, 98, 148;
     --bs-secondary-rgb: 59, 74, 89;
 
     /* RGB for the remapped semantic colors */
-    --bs-success-rgb: 33, 41, 50; /* Matches primary */
-    --bs-info-rgb: 59, 74, 89; /* Matches secondary */
-    --bs-warning-rgb: 59, 74, 89; /* Matches secondary */
-    --bs-danger-rgb: 139, 0, 0; /* RGB for #8B0000 */
+    --bs-success-rgb: 40, 167, 69;
+    --bs-info-rgb: 23, 162, 184;
+    --bs-warning-rgb: 255, 193, 7;
+    --bs-danger-rgb: 220, 53, 69;
 
     --bs-light-rgb: 248, 249, 250;
     --bs-dark-rgb: 52, 58, 64;
@@ -346,4 +345,49 @@ body {
     background-color: var(--bs-warning-bg-subtle) !important;
     border-color: var(--bs-warning-border-subtle) !important;
     color: var(--bs-warning-text-emphasis) !important;
+}
+
+/* Custom Button Styles to adhere to 2-3 color scheme */
+.btn-success {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+    color: var(--bs-light);
+}
+
+.btn-success:hover {
+    background-color: var(--bs-secondary);
+    border-color: var(--bs-secondary);
+}
+
+.btn-info {
+    background-color: var(--bs-secondary);
+    border-color: var(--bs-secondary);
+    color: var(--bs-light);
+}
+
+.btn-info:hover {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+}
+
+.btn-warning {
+    background-color: var(--bs-secondary); /* Use secondary color for warning button */
+    border-color: var(--bs-secondary);
+    color: var(--bs-light);
+}
+
+.btn-warning:hover {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+}
+
+.btn-danger {
+    background-color: #8B0000; /* Dark red for critical actions */
+    border-color: #8B0000;
+    color: var(--bs-light);
+}
+
+.btn-danger:hover {
+    background-color: #A30000; /* Slightly lighter red on hover */
+    border-color: #A30000;
 }
