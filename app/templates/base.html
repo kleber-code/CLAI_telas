@@ -123,9 +123,14 @@
                         </span>
                     </a>
                     {% endif %}
-                    <button class="btn btn-link text-body-secondary p-0" id="theme-toggle" title="Alternar Tema">
-                        <i class="bi bi-moon-stars"></i>
-                    </button>
+                    <div class="dropdown">
+                        <select id="theme-select" class="form-select form-select-sm" aria-label="Selecionar Tema">
+                            <option value="light">Claro</option>
+                            <option value="dark">Escuro</option>
+                            <option value="high-contrast">Alto Contraste</option>
+                            <option value="deuteranomaly">Deuteranomalia</option>
+                        </select>
+                    </div>
 
                     <div class="dropdown">
                         <a class="d-flex align-items-center text-decoration-none dropdown-toggle" href="#" role="button"
@@ -244,26 +249,32 @@
 
             // Removi a lógica de localStorage por enquanto para evitar confusão no Mobile
 
-            // Dark Mode Toggle (Mantido igual)
-            if (themeToggle) {
+            // Theme Select
+            const themeSelect = document.getElementById('theme-select');
+            const html = document.documentElement;
+
+            function applyTheme(theme) {
+                html.setAttribute('data-bs-theme', theme);
+                localStorage.setItem('theme', theme);
+                // Set the select box value to reflect the applied theme
+                if (themeSelect) {
+                    themeSelect.value = theme;
+                }
+            }
+
+            if (themeSelect) {
                 // Apply saved theme on load
                 const savedTheme = localStorage.getItem('theme');
-                const html = document.documentElement;
                 if (savedTheme) {
-                    html.setAttribute('data-bs-theme', savedTheme);
-                    themeToggle.innerHTML = savedTheme === 'light' ? '<i class="bi bi-moon-stars"></i>' : '<i class="bi bi-sun"></i>';
+                    applyTheme(savedTheme);
                 } else {
                     // Default to light if no theme saved
-                    html.setAttribute('data-bs-theme', 'light');
-                    themeToggle.innerHTML = '<i class="bi bi-moon-stars"></i>';
+                    applyTheme('light');
                 }
 
-                themeToggle.addEventListener('click', () => {
-                    const currentTheme = html.getAttribute('data-bs-theme');
-                    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-                    html.setAttribute('data-bs-theme', newTheme);
-                    themeToggle.innerHTML = newTheme === 'light' ? '<i class="bi bi-moon-stars"></i>' : '<i class="bi bi-sun"></i>';
-                    localStorage.setItem('theme', newTheme); // Save new theme to localStorage
+                themeSelect.addEventListener('change', (event) => {
+                    const newTheme = event.target.value;
+                    applyTheme(newTheme);
                 });
             }
 

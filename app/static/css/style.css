@@ -347,47 +347,96 @@ body {
     color: var(--bs-warning-text-emphasis) !important;
 }
 
-/* Custom Button Styles to adhere to 2-3 color scheme */
-.btn-success {
-    background-color: var(--bs-primary);
-    border-color: var(--bs-primary);
-    color: var(--bs-light);
+/* --- THEMES PERSONALIZADOS --- */
+
+/* High-Contrast Theme */
+html[data-bs-theme="high-contrast"] {
+    --bs-primary: #00ffff; /* Ciano Brilhante para destaque */
+    --bs-secondary: #ffffff; /* Branco Puro para texto */
+    --bs-body-bg: #000000;      /* Fundo Preto */
+    --bs-body-color: #ffffff;   /* Texto Branco */
+    --bs-secondary-color: #e0e0e0; /* Cinza Claro para texto secundário */
+    --bs-tertiary-bg: #333333;  /* Cinza Escuro para elementos */
+    --bs-border-color: #00ffff; /* Borda Ciano */
+
+    /* Redefinição de cores semânticas para alto contraste */
+    --bs-success: #00ff00;
+    --bs-info: #ffff00;
+    --bs-warning: #ff00ff;
+    --bs-danger: #ff0000;
+
+    --bs-primary-rgb: 0, 255, 255;
+    --bs-secondary-rgb: 255, 255, 255;
+    --bs-success-rgb: 0, 255, 0;
+    --bs-info-rgb: 255, 255, 0;
+    --bs-warning-rgb: 255, 0, 255;
+    --bs-danger-rgb: 255, 0, 0;
+
+    --bs-light: #333333; /* Usar um cinza escuro para 'light' em modo de alto contraste */
+    --bs-dark: #cccccc; /* Usar um cinza claro para 'dark' em modo de alto contraste */
+
+    /* Ajustes específicos para alto contraste em componentes */
+    .list-group-item {
+        color: var(--bs-secondary-color) !important;
+        border: 1px solid var(--bs-border-color) !important;
+        background-color: var(--bs-tertiary-bg) !important;
+    }
+    .list-group-item:hover {
+        background-color: var(--bs-primary) !important;
+        color: var(--bs-body-bg) !important; /* Inverte cor para hover */
+    }
+    .list-group-item.active {
+        background-color: var(--bs-primary) !important;
+        color: var(--bs-body-bg) !important;
+    }
+
+    .card {
+        background-color: var(--bs-tertiary-bg);
+        border: 2px solid var(--bs-border-color);
+    }
+    .card-header {
+        color: var(--bs-body-color);
+        background-color: var(--bs-body-bg);
+        border-bottom-color: var(--bs-border-color);
+    }
+    .form-control, .form-select {
+        background-color: var(--bs-body-bg);
+        color: var(--bs-body-color);
+        border: 1px solid var(--bs-border-color);
+    }
+    .form-control:focus, .form-select:focus {
+        box-shadow: 0 0 0 3px rgba(var(--bs-primary-rgb), 0.5);
+    }
 }
 
-.btn-success:hover {
-    background-color: var(--bs-secondary);
-    border-color: var(--bs-secondary);
-}
+/* Deuteranomaly Theme (Basic adjustment - typically requires more nuanced color palette review) */
+html[data-bs-theme="deuteranomaly"] {
+    /* Main color adjustments - focusing on distinguishing red/green */
+    --bs-primary: #007bff; /* Keep original blue for general primary */
+    --bs-success: #008000; /* Darker green, less red component */
+    --bs-danger: #e03232;  /* Slightly desaturated red */
+    --bs-warning: #ffa500; /* Orange instead of yellow to avoid confusion with green */
 
-.btn-info {
-    background-color: var(--bs-secondary);
-    border-color: var(--bs-secondary);
-    color: var(--bs-light);
-}
+    /* Example: increase luminance contrast for green/red areas */
+    /* This is highly dependent on specific design elements and might need more targeted rules */
+    .text-success { color: #008000 !important; }
+    .bg-success { background-color: #008000 !important; }
+    .text-danger { color: #e03232 !important; }
+    .bg-danger { background-color: #e03232 !important; }
+    .badge.bg-success { background-color: #008000 !important; }
+    .badge.bg-danger { background-color: #e03232 !important; }
 
-.btn-info:hover {
-    background-color: var(--bs-primary);
-    border-color: var(--bs-primary);
-}
+    /* Ensure text colors maintain good contrast */
+    --bs-body-color: #212529; /* Default dark text */
+    --bs-body-bg: #f8f9fa; /* Default light background */
 
-.btn-warning {
-    background-color: var(--bs-secondary); /* Use secondary color for warning button */
-    border-color: var(--bs-secondary);
-    color: var(--bs-light);
-}
-
-.btn-warning:hover {
-    background-color: var(--bs-primary);
-    border-color: var(--bs-primary);
-}
-
-.btn-danger {
-    background-color: #8B0000; /* Dark red for critical actions */
-    border-color: #8B0000;
-    color: var(--bs-light);
-}
-
-.btn-danger:hover {
-    background-color: #A30000; /* Slightly lighter red on hover */
-    border-color: #A30000;
+    /* If in dark mode, adjust accordingly */
+    &[data-bs-theme="dark"] {
+        --bs-body-color: #f8f9fa;
+        --bs-body-bg: #212529;
+        --bs-success: #28a745; /* Original green for dark mode */
+        --bs-danger: #dc3545;  /* Original red for dark mode */
+        --bs-warning: #ffc107; /* Original yellow for dark mode */
+        /* For dark mode, the strategy might be different. This example keeps it simple */
+    }
 }
